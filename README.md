@@ -1,4 +1,4 @@
-# StellarLearn — On-Device Personalized Learning Assistant
+# student_matrix — On-Device Personalized Learning Assistant
 
 A private, offline-first learning assistant that adapts to each student's pace, knowledge level, strengths and weaknesses.
 Everything — the learner model, question selection, tutor, note processing and spaced repetition — runs **in the browser on the student's device**. There is no backend, no account and no API key.
@@ -21,7 +21,7 @@ Everything — the learner model, question selection, tutor, note processing and
 ## Run it
 
 ```bash
-cd StellarLearn_
+cd student_matrix_
 npm install
 npm run dev        # development
 npm run build && npm run preview   # production build (needed to test offline mode)
@@ -33,7 +33,7 @@ Open the production build once while online; after that it works with no connect
 ## Structure
 
 ```
-StellarLearn_/
+student_matrix_/
 ├── public/ (data/quests.json, data/flashcards.json, sw.js, manifest.webmanifest)
 ├── scripts/engine-check.ts
 └── src/

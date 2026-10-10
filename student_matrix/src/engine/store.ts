@@ -2,9 +2,9 @@ import { useSyncExternalStore } from 'react';
 import type { Profile, Settings } from './types';
 
 const PROFILE_KEY = 'student_matrix.profile.v2';
-const LEGACY_PROFILE_KEY = 'stellarlearn.profile.v2';
+const LEGACY_PROFILE_KEY = 'student_matrix.profile.v1';
 const SETTINGS_KEY = 'student_matrix.settings.v2';
-const LEGACY_SETTINGS_KEY = 'stellarlearn.settings.v2';
+const LEGACY_SETTINGS_KEY = 'student_matrix.settings.v1';
 
 const lowEnd = (): boolean => {
   try {
@@ -70,7 +70,7 @@ export const exportAll = (): string =>
 
 export const importAll = (json: string): void => {
   const data = JSON.parse(json);
-  if (!['student_matrix', 'stellarlearn'].includes(data?.app) || !data.profile) throw new Error('Not a student_matrix backup file');
+  if (!['student_matrix', 'student_matrixlearn'].includes(data?.app) || !data.profile) throw new Error('Not a student_matrix backup file');
   profileStore.set({ ...defaultProfile(), ...data.profile });
   if (data.settings) settingsStore.set({ ...defaultSettings(), ...data.settings });
 };

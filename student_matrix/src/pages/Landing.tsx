@@ -98,7 +98,7 @@ export const Landing = () => {
               <div className="w-px h-12 bg-gradient-to-b from-transparent via-white/30 to-transparent" />
               <div className="text-center">
                 <div className="text-3xl font-bold text-white">4.9/5</div>
-                <div className="text-sm text-white/60">Stellar Rating</div>
+                <div className="text-sm text-white/60">Rating</div>
               </div>
             </div>
           </div>

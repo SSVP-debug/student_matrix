@@ -145,7 +145,7 @@ input, select, textarea { color: #fff; }
 }
 
 
-/* StellarLearn cosmic UI layer — visual-only enhancements for student_matrix. */
+/* Cosmic glass UI layer for student_matrix. */
 :root {
   color-scheme: dark;
   --cosmic-bg: #050609;

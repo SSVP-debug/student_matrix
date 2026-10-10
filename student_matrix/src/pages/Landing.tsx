@@ -30,7 +30,7 @@ export const Landing = () => {
       <nav className="relative z-20 flex items-center justify-between px-8 py-6">
         <div className="flex items-center gap-3">
           <Logo size={48} />
-          <span className="text-2xl font-bold text-white">StellarLearn</span>
+          <span className="text-2xl font-bold text-white">student_matrix</span>
         </div>
         <div className="flex items-center gap-4">
           <button
@@ -123,7 +123,7 @@ export const Landing = () => {
                     {/* Replace with your image */}
                     <img 
                       src="/images/Pixie.webp" 
-                      alt="StellarLearn Hero"
+                      alt="student_matrix Hero"
                       className="w-full h-full object-cover"
                     />
                     {/* White glow effect */}
@@ -152,7 +152,7 @@ export const Landing = () => {
       <section className="relative z-10 container mx-auto px-8 py-20">
         <div className="text-center mb-20">
           <h2 className="text-5xl font-bold text-white mb-6">
-            Why Choose <span className="text-white">StellarLearn?</span>
+            Why Choose <span className="text-white">student_matrix?</span>
           </h2>
           <p className="text-xl text-white/60 max-w-3xl mx-auto leading-relaxed capitalize">
             Experience the future of education with our cosmic learning ecosystem designed to make 
@@ -295,7 +295,7 @@ export const Landing = () => {
             <div className="lg:col-span-2">
               <div className="flex items-center gap-3 mb-6">
                 <Logo size={40} />
-                <span className="text-3xl font-bold text-white">StellarLearn</span>
+                <span className="text-3xl font-bold text-white">student_matrix</span>
               </div>
               <p className="text-white/70 text-lg leading-relaxed max-w-md capitalize">
                 Pioneering the future of education through cosmic exploration and AI-powered learning adventures. 
@@ -357,7 +357,7 @@ export const Landing = () => {
           
            <div className="border-t border-white/10 pt-8 flex flex-col lg:flex-row justify-between items-center">
             <p className="text-white/60 text-base capitalize">
-              © {new Date().getFullYear()} StellarLearn. Embark on infinite learning possibilities.
+              © {new Date().getFullYear()} student_matrix. Embark on infinite learning possibilities.
             </p>
             <div className="flex gap-10 mt-4 lg:mt-0">
               {[

@@ -1,7 +1,7 @@
-/* StellarLearn service worker: makes the app work with no connection.
+/* student_matrix service worker: makes the app work with no connection.
    - Same-origin GET requests only (nothing is ever sent to third parties).
    - App shell + data are cached on first visit; later visits use the cache first and refresh it quietly. */
-const CACHE = 'stellarlearn-v2';
+const CACHE = 'student_matrix-v2';
 const PRECACHE = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg', '/data/quests.json', '/data/flashcards.json'];
 
 self.addEventListener('install', (e) => {

@@ -1,6 +1,6 @@
 {
-  "name": "StellarLearn",
-  "short_name": "StellarLearn",
+  "name": "student_matrix",
+  "short_name": "student_matrix",
   "description": "Private, offline, adaptive learning assistant",
   "start_url": "/dashboard",
   "scope": "/",

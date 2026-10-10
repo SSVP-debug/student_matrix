@@ -16,6 +16,8 @@ export const Settings = () => {
   const s = useSettings();
   const fileRef = useRef<HTMLInputElement>(null);
   const [msg, setMsg] = useState('');
+  const [onlineStatus, setOnlineStatus] = useState('');
+  const [checkingOnline, setCheckingOnline] = useState(false);
   const kb = (storageBytes() / 1024).toFixed(1);
 
   const download = () => {
@@ -29,6 +31,23 @@ export const Settings = () => {
     if (fileRef.current) fileRef.current.value = '';
   };
   const llmBad = s.localLlmUrl !== '' && !isLocalUrl(s.localLlmUrl);
+  const checkOnline = async () => {
+    setCheckingOnline(true);
+    setOnlineStatus('');
+    try {
+      const response = await fetch('/api/health', { cache: 'no-store' });
+      if (!response.ok) throw new Error('API status check failed.');
+      const data = await response.json() as { onlineProviders?: { openai?: boolean; gemini?: boolean } };
+      const configured = Boolean(data.onlineProviders?.[s.onlineProvider]);
+      setOnlineStatus(configured
+        ? (s.onlineProvider === 'openai' ? 'OpenAI' : 'Gemini') + ' is configured on the server.'
+        : (s.onlineProvider === 'openai' ? 'OPENAI_API_KEY' : 'GEMINI_API_KEY') + ' is missing from the server environment.');
+    } catch {
+      setOnlineStatus('Cannot reach the AI API. For local development, run npm run dev:api in a second terminal and configure a server key.');
+    } finally {
+      setCheckingOnline(false);
+    }
+  };
 
   return (
     <Page title="Settings" subtitle="Accessibility, performance and privacy controls.">
@@ -60,6 +79,20 @@ export const Settings = () => {
           <p className="text-sm text-white/70 mt-3">The app works fully offline after the first load and uses about {kb} KB of local storage for your progress.</p>
         </Card>
 
+        <Card className="glass-hover">
+          <h2 className="text-xl font-semibold tracking-tight mb-1">Online AI mode</h2>
+          <p className="text-sm text-white/70 mb-3">Choose the cloud tutor used when AI mode is set to Online on the Tutor page. Keep API keys on your server; never paste them into this app or commit them to GitHub.</p>
+          <label htmlFor="online-provider" className="block text-sm text-white/70 mb-1">Cloud provider</label>
+          <select id="online-provider" value={s.onlineProvider} onChange={(e) => { updateSettings({ onlineProvider: e.target.value as typeof s.onlineProvider }); setOnlineStatus(''); }} className="w-full rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-3">
+            <option value="gemini">Google Gemini</option><option value="openai">OpenAI</option>
+          </select>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button className={btnGhost} onClick={checkOnline} disabled={checkingOnline}>{checkingOnline ? 'Checking…' : 'Check server configuration'}</button>
+          </div>
+          {onlineStatus && <p role="status" className="text-sm mt-3 text-white/80">{onlineStatus}</p>}
+          <p className="text-xs text-white/60 mt-3">Server variables: GEMINI_API_KEY or OPENAI_API_KEY. Optional model overrides: GEMINI_MODEL and OPENAI_MODEL. Cloud providers may charge for usage.</p>
+        </Card>
+
         <Card className="glass-hover glass-hover">
           <h2 className="text-xl font-semibold tracking-tight mb-1">Optional local AI model</h2>
           <p className="text-sm text-white/70 mb-3">The tutor already works without any model. If you run an Ollama server on this computer or your home network, the tutor can use it for fuller answers. Only localhost / private-network addresses are accepted, so your questions never go to the internet.</p>
@@ -72,7 +105,7 @@ export const Settings = () => {
 
         <Card className="glass-hover lg:col-span-2">
           <h2 className="text-xl font-semibold tracking-tight mb-1">Your data</h2>
-          <p className="text-sm text-white/70 mb-4">All progress, notes and settings are stored only in this browser. There is no account and no server. Export a backup to move to another device.</p>
+          <p className="text-sm text-white/70 mb-4">Progress, notes and settings remain in this browser. In Online mode, your question and relevant excerpts from course material or notes are sent to the selected AI provider to generate a reply. Export a backup to move to another device.</p>
           <div className="flex flex-wrap gap-3">
             <button className={btnPrimary} onClick={download}><Download className="inline w-4 h-4 mr-1" aria-hidden />Export backup</button>
             <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={(e) => upload(e.target.files?.[0])} />

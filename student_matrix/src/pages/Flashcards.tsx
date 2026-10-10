@@ -66,14 +66,14 @@ export const Flashcards = () => {
     <Page title="Flashcards" subtitle="Spaced repetition: cards you find hard come back sooner, easy ones later.">
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <label htmlFor="subj" className="text-sm text-white/70">Subject</label>
-        <select id="subj" value={subject} onChange={(e) => setSubject(e.target.value)} className="rounded-2xl bg-black border border-white/20 p-2">
+        <select id="subj" value={subject} onChange={(e) => setSubject(e.target.value)} className="rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-2">
           <option value="">All subjects</option>{subjects.map((x) => <option key={x}>{x}</option>)}
         </select>
         <span className="text-sm text-white/70">{queue?.length ?? 0} left · {done} reviewed</span>
       </div>
       {!cur ? (
         <Card className="max-w-2xl">
-          <h2 className="text-xl font-semibold mb-2">All caught up 🎉</h2>
+          <h2 className="text-xl font-semibold tracking-tight mb-2">All caught up 🎉</h2>
           <p className="text-white/70">{nextDue ? `Next review ${new Date(nextDue).toLocaleString()}.` : 'No cards scheduled.'}</p>
           <button className={`${btnPrimary} mt-4`} onClick={build}>Check again</button>
         </Card>
@@ -81,7 +81,7 @@ export const Flashcards = () => {
         <Card className="max-w-2xl space-y-4">
           <p className="text-xs uppercase tracking-wide text-white/60">{cur.subject}</p>
           <button onClick={() => setFlip(!flip)} aria-label={flip ? 'Show question' : 'Show answer'} className="w-full min-h-[200px] text-left p-6 rounded-2xl bg-white/5 border border-white/15">
-            <p className="text-xl font-semibold">{cur.question}</p>
+            <p className="text-xl font-semibold tracking-tight">{cur.question}</p>
             {flip && <p className="mt-4 text-white/85 border-t border-white/10 pt-4">{cur.answer}</p>}
             {!flip && <p className="mt-6 text-sm text-white/60">Think of the answer, then press Space or tap to reveal.</p>}
           </button>

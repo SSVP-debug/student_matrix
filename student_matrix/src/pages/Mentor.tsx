@@ -19,7 +19,7 @@ export const Mentor = () => {
   const s = useSettings();
   const { data, error } = useStaticData();
   const index = useMemo(() => (data ? buildIndex(data, p) : null), [data, p.notes]); // eslint-disable-line react-hooks/exhaustive-deps
-  const [msgs, setMsgs] = useState<Msg[]>([{ role: 'tutor', text: "Hi, I'm Pixie, your on-device tutor. Ask me about anything in your course material or your own notes. I work offline, and I adjust how I explain based on how well you know the topic." }]);
+  const [msgs, setMsgs] = useState<Msg[]>([{ role: 'tutor', text: "Hi, I'm Pixie, your personal tutor. I can use the built-in offline tutor or an optional online AI provider. I adapt explanations to your learning level." }]);
   const [q, setQ] = useState('');
   const [busy, setBusy] = useState(false);
   const end = useRef<HTMLDivElement>(null);
@@ -42,10 +42,21 @@ export const Mentor = () => {
   return (
     <Page title="Tutor" subtitle="Answers come from material stored on your device, explained at your level.">
       <div className="flex flex-wrap items-center gap-3 mb-4">
+        <label htmlFor="ai-mode" className="text-sm text-white/70">AI mode</label>
+        <select id="ai-mode" value={s.aiMode} onChange={(e) => updateSettings({ aiMode: e.target.value as Settings['aiMode'] })} className="rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-2">
+          <option value="offline">Offline — private, no API key</option><option value="online">Online — cloud AI</option>
+        </select>
+        {s.aiMode === 'online' && <>
+          <label htmlFor="ai-provider" className="text-sm text-white/70">Provider</label>
+          <select id="ai-provider" value={s.onlineProvider} onChange={(e) => updateSettings({ onlineProvider: e.target.value as Settings['onlineProvider'] })} className="rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-2">
+            <option value="gemini">Google Gemini</option><option value="openai">OpenAI</option>
+          </select>
+        </>}
         <label htmlFor="lvl" className="text-sm text-white/70">Explanation level</label>
         <select id="lvl" value={s.tutorLevel} onChange={(e) => updateSettings({ tutorLevel: e.target.value as Settings['tutorLevel'] })} className="rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-2">
           <option value="auto">Auto (matches my mastery)</option><option value="simple">Simple</option><option value="standard">Standard</option><option value="deep">Deep</option>
         </select>
+        <span className="text-xs text-white/60">{s.aiMode === 'offline' ? 'Questions stay on this device.' : 'Questions and relevant excerpts are sent to your selected AI provider.'}</span>
       </div>
       <Card className="max-w-3xl flex flex-col" >
         <div className="space-y-4 max-h-[55vh] overflow-y-auto pr-1" aria-live="polite">

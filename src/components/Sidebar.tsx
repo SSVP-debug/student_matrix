@@ -53,7 +53,7 @@ export const Sidebar = () => {
             <div className="relative w-7 h-7 rounded-full bg-gradient-to-tr from-[#0284c7] via-[#38bdf8] to-[#93c5fd] shadow-[0_0_15px_#38bdf8]" />
           </div>
           <span className="text-xl font-bold tracking-tight text-white font-sans">
-            StellarLearn
+            student_matrix
           </span>
         </button>
 
@@ -130,7 +130,7 @@ export const Sidebar = () => {
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-[#08090d]/95 backdrop-blur-xl border-b border-[#1e2230] p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#0284c7] via-[#38bdf8] to-[#93c5fd] shadow-[0_0_10px_#38bdf8]" />
-          <span className="text-lg font-bold text-white tracking-tight">StellarLearn</span>
+          <span className="text-lg font-bold text-white tracking-tight">student_matrix</span>
         </div>
         <button
           aria-label={open ? 'Close navigation' : 'Open navigation'}

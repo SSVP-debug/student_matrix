@@ -62,7 +62,7 @@ export const Settings = () => {
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState(s.name || 'Zero');
-  const [email, setEmail] = useState(s.email || 'zero@stellarlearn.space');
+  const [email, setEmail] = useState(s.email || 'zero@student_matrix.space');
   const [avatarUrl, setAvatarUrl] = useState(s.avatarUrl || '/images/avatar.jpg');
   const [dailyReminders, setDailyReminders] = useState(s.dailyReminders ?? true);
   const [achievementAlerts, setAchievementAlerts] = useState(s.achievementAlerts ?? true);
@@ -82,7 +82,7 @@ export const Settings = () => {
   const handleSave = () => {
     updateSettings({
       name: name.trim() || 'Zero',
-      email: email.trim() || 'zero@stellarlearn.space',
+      email: email.trim() || 'zero@student_matrix.space',
       avatarUrl,
       dailyReminders,
       achievementAlerts,
@@ -115,7 +115,7 @@ export const Settings = () => {
     const url = URL.createObjectURL(new Blob([exportAll()], { type: 'application/json' }));
     const a = document.createElement('a');
     a.href = url;
-    a.download = `stellarlearn-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `student_matrix-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
     setMsg({ text: 'Backup downloaded successfully.', type: 'success' });
@@ -249,7 +249,7 @@ export const Settings = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-[#12141c] border border-[#1e2230] rounded-xl p-3.5 text-xs text-white placeholder-[#64748b] focus:outline-none focus:border-[#2f364b]"
-                  placeholder="zero@stellarlearn.space"
+                  placeholder="zero@student_matrix.space"
                 />
               </div>
             </div>

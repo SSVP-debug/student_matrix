@@ -33,6 +33,7 @@ function read<T>(key: string, fallback: () => T): T {
   try {
     const legacyKey = key === PROFILE_KEY ? LEGACY_PROFILE_KEY : key === SETTINGS_KEY ? LEGACY_SETTINGS_KEY : null;
     const raw = localStorage.getItem(key) ?? (legacyKey ? localStorage.getItem(legacyKey) : null);
+    if (raw && !localStorage.getItem(key) && legacyKey) localStorage.setItem(key, raw);
     if (!raw) return fallback();
     return { ...fallback(), ...JSON.parse(raw) } as T;
   } catch {

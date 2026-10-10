@@ -143,3 +143,79 @@ input, select, textarea { color: #fff; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+
+/* Cosmic glass UI layer for student_matrix. */
+:root {
+  color-scheme: dark;
+  --cosmic-bg: #050609;
+  --cosmic-panel: rgba(255, 255, 255, 0.045);
+  --cosmic-panel-hover: rgba(255, 255, 255, 0.075);
+  --cosmic-border: rgba(255, 255, 255, 0.11);
+  --cosmic-cyan: #00e5ff;
+  --cosmic-violet: #5a00ff;
+}
+
+html, body, #root { min-height: 100%; }
+body {
+  background:
+    radial-gradient(ellipse at 18% 0%, rgba(90, 0, 255, 0.12), transparent 34rem),
+    radial-gradient(ellipse at 88% 14%, rgba(0, 229, 255, 0.07), transparent 28rem),
+    var(--cosmic-bg);
+}
+
+button, input, select, textarea { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+button:not(:disabled) { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+
+.glass {
+  background: linear-gradient(135deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+  border: 1px solid var(--cosmic-border);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255,255,255,.035);
+  backdrop-filter: blur(16px);
+}
+
+@media (hover: hover) {
+  .glass-hover {
+    transition: transform .24s ease, border-color .24s ease, background .24s ease, box-shadow .24s ease;
+  }
+  .glass-hover:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 229, 255, .26);
+    background: var(--cosmic-panel-hover);
+    box-shadow: 0 20px 52px rgba(0, 0, 0, .28), 0 0 24px rgba(0,229,255,.035);
+  }
+}
+
+.cosmic-heading {
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.cosmic-gradient-text {
+  background: linear-gradient(100deg, #ffffff 5%, #b8f7ff 48%, #c8b5ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.cosmic-button {
+  box-shadow: 0 0 0 1px rgba(0, 229, 255, .12), 0 8px 26px rgba(0, 229, 255, .08);
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.cosmic-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px rgba(0, 229, 255, .28), 0 10px 30px rgba(0, 229, 255, .14);
+}
+
+::selection { background: rgba(90, 0, 255, .45); color: white; }
+
+@media (max-width: 640px) {
+  .glass { border-radius: 1.25rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float, .animate-shimmer, .animate-spin-slow, .animate-spin-fast { animation: none !important; }
+  .glass-hover, .cosmic-button { transition: none !important; }
+}

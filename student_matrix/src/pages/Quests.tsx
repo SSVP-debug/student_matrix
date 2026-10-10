@@ -85,7 +85,7 @@ export const Quests = () => {
         <Card className="max-w-2xl space-y-5">
           <div>
             <label htmlFor="topic" className="block text-sm text-white/70 mb-1">What to practise</label>
-            <select id="topic" value={topic} onChange={(e) => setTopic(e.target.value)} className="w-full rounded-2xl bg-black border border-white/20 p-3">
+            <select id="topic" value={topic} onChange={(e) => setTopic(e.target.value)} className="w-full rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-3">
               <option value="">Smart mix — focus on what I need most</option>
               {topics.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
@@ -111,7 +111,7 @@ export const Quests = () => {
     return (
       <Page title="Session complete">
         <Card className="max-w-2xl space-y-4">
-          <p className="text-4xl font-bold">{right}/{results.length}</p>
+          <p className="cosmic-heading text-4xl font-bold">{right}/{results.length}</p>
           <p className="text-white/70">+{xp} XP · {results.length ? Math.round((right / results.length) * 100) : 0}% correct</p>
           {deltas.map(({ k, d }) => <p key={k} className="text-sm">{k}: mastery {d >= 0 ? '+' : ''}{d}%</p>)}
           {results.some((r) => !r.correct) && (
@@ -132,7 +132,7 @@ export const Quests = () => {
     <Page title="Adaptive Practice" subtitle={`${q.topic} · question ${Math.min(results.length + (sel === null ? 1 : 0), total)} of ${total}`}>
       <Card className="max-w-3xl space-y-4">
         <div className="flex items-start justify-between gap-3">
-          <h2 className="text-xl font-semibold" id="qtext">{q.text}</h2>
+          <h2 className="text-xl font-semibold tracking-tight" id="qtext">{q.text}</h2>
           <button className={btnGhost} aria-label="Read question aloud" onClick={() => speak(`${q.text}. ${q.options.map((o, i) => `Option ${i + 1}: ${o}`).join('. ')}`, settings.speechRate)}><Volume2 className="w-4 h-4" /></button>
         </div>
         <div role="group" aria-labelledby="qtext" className="space-y-2">
@@ -151,7 +151,7 @@ export const Quests = () => {
         {sel === null ? (
           <button className={btnGhost} disabled={visible !== null} onClick={() => setVisible(fiftyFifty(q))}><Lightbulb className="inline w-4 h-4 mr-1" aria-hidden />Hint: remove two wrong answers (half XP)</button>
         ) : (
-          <div role="status" className="p-4 rounded-2xl bg-white/5 border border-white/10">
+          <div role="status" className="p-4 rounded-2xl glass-hover bg-white/5 border border-white/10">
             <p className="font-semibold mb-1">{sel === q.answer ? 'Correct!' : 'Not quite.'}</p>
             <p className="text-white/80">{q.explanation}</p>
             {sel !== q.answer && <p className="text-white/70 text-sm mt-2">This will come back later in a new session so you can lock it in.</p>}

@@ -43,7 +43,7 @@ export const Mentor = () => {
     <Page title="Tutor" subtitle="Answers come from material stored on your device, explained at your level.">
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <label htmlFor="lvl" className="text-sm text-white/70">Explanation level</label>
-        <select id="lvl" value={s.tutorLevel} onChange={(e) => updateSettings({ tutorLevel: e.target.value as Settings['tutorLevel'] })} className="rounded-2xl bg-black border border-white/20 p-2">
+        <select id="lvl" value={s.tutorLevel} onChange={(e) => updateSettings({ tutorLevel: e.target.value as Settings['tutorLevel'] })} className="rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-2">
           <option value="auto">Auto (matches my mastery)</option><option value="simple">Simple</option><option value="standard">Standard</option><option value="deep">Deep</option>
         </select>
       </div>
@@ -51,7 +51,7 @@ export const Mentor = () => {
         <div className="space-y-4 max-h-[55vh] overflow-y-auto pr-1" aria-live="polite">
           {msgs.map((m, i) => (
             <div key={i} className={m.role === 'user' ? 'text-right' : ''}>
-              <div className={`inline-block max-w-full text-left rounded-2xl p-4 ${m.role === 'user' ? 'bg-white text-black' : 'bg-white/5 border border-white/10'}`}>
+              <div className={`inline-block max-w-full text-left rounded-2xl p-4 ${m.role === 'user' ? 'bg-white text-black' : 'glass border border-white/10'}`}>
                 {m.role === 'user' ? m.text : <Md text={m.text} />}
                 {m.reply && (
                   <div className="flex flex-wrap gap-2 mt-3">
@@ -70,7 +70,7 @@ export const Mentor = () => {
         </div>
         <form className="flex gap-2 mt-3" onSubmit={(e) => { e.preventDefault(); ask(q); }}>
           <label htmlFor="q" className="sr-only">Your question</label>
-          <input id="q" value={q} onChange={(e) => setQ(e.target.value)} disabled={!index} placeholder={index ? 'Ask a question…' : 'Loading course material…'} className="flex-1 rounded-2xl bg-black border border-white/20 p-3" />
+          <input id="q" value={q} onChange={(e) => setQ(e.target.value)} disabled={!index} placeholder={index ? 'Ask a question…' : 'Loading course material…'} className="flex-1 rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-3" />
           <button type="submit" className={btnPrimary} disabled={busy || !q.trim()} aria-label="Send"><Send className="w-4 h-4" /></button>
           <button type="button" className={btnGhost} aria-label="Stop reading" onClick={stopSpeaking}><Square className="w-4 h-4" /></button>
         </form>

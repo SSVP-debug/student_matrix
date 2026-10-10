@@ -38,19 +38,19 @@ export const Dashboard = () => {
   return (
     <Page title={`Welcome back, ${s.name}`} subtitle="Everything here is computed on your device — your progress never leaves it.">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card><Zap className="w-5 h-5 mb-2" aria-hidden /><p className="text-2xl font-bold">Level {lvl}</p><p className="text-white/70 text-sm mb-2">{p.xp} XP</p><Bar value={into} label="Progress to next level" /></Card>
-        <Card><Flame className="w-5 h-5 mb-2" aria-hidden /><p className="text-2xl font-bold">{p.streak} day{p.streak === 1 ? '' : 's'}</p><p className="text-white/70 text-sm">Streak (best {p.bestStreak})</p></Card>
-        <Card><Target className="w-5 h-5 mb-2" aria-hidden /><p className="text-2xl font-bold">{today}/{s.dailyGoal}</p><p className="text-white/70 text-sm mb-2">Questions today</p><Bar value={Math.min(1, today / s.dailyGoal)} label="Daily goal" /></Card>
-        <Card><Clock className="w-5 h-5 mb-2" aria-hidden /><p className="text-2xl font-bold">{acc}%</p><p className="text-white/70 text-sm">Accuracy · {hours < 1 ? `${Math.round(hours * 60)} min` : `${hours.toFixed(1)} h`} studied</p></Card>
+        <Card><Zap className="w-5 h-5 mb-2" aria-hidden /><p className="cosmic-heading text-2xl font-bold">Level {lvl}</p><p className="text-white/70 text-sm mb-2">{p.xp} XP</p><Bar value={into} label="Progress to next level" /></Card>
+        <Card><Flame className="w-5 h-5 mb-2" aria-hidden /><p className="cosmic-heading text-2xl font-bold">{p.streak} day{p.streak === 1 ? '' : 's'}</p><p className="text-white/70 text-sm">Streak (best {p.bestStreak})</p></Card>
+        <Card><Target className="w-5 h-5 mb-2" aria-hidden /><p className="cosmic-heading text-2xl font-bold">{today}/{s.dailyGoal}</p><p className="text-white/70 text-sm mb-2">Questions today</p><Bar value={Math.min(1, today / s.dailyGoal)} label="Daily goal" /></Card>
+        <Card><Clock className="w-5 h-5 mb-2" aria-hidden /><p className="cosmic-heading text-2xl font-bold">{acc}%</p><p className="text-white/70 text-sm">Accuracy · {hours < 1 ? `${Math.round(hours * 60)} min` : `${hours.toFixed(1)} h`} studied</p></Card>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-4 mb-6">
         <Card className="lg:col-span-2">
-          <h2 className="text-xl font-semibold mb-3">Recommended for you</h2>
+          <h2 className="text-xl font-semibold tracking-tight mb-3">Recommended for you</h2>
           {!view ? <p className="text-white/70">Loading…</p> : (
             <ul className="space-y-3">
               {view.recs.map((r) => (
-                <li key={r.title} className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-white/5 border border-white/10">
+                <li key={r.title} className="flex items-center justify-between gap-3 p-3 rounded-2xl glass-hover bg-white/5 border border-white/10">
                   <div className="min-w-0"><p className="font-medium">{r.title}</p><p className="text-white/70 text-sm">{r.reason}</p></div>
                   <button className={btnPrimary} onClick={() => nav(r.path)} aria-label={`Go: ${r.title}`}><ArrowRight className="w-4 h-4" /></button>
                 </li>
@@ -59,8 +59,8 @@ export const Dashboard = () => {
           )}
         </Card>
         <Card>
-          <h2 className="text-xl font-semibold mb-1">Your pace</h2>
-          <p className="text-3xl font-bold mb-2">{pace}</p>
+          <h2 className="text-xl font-semibold tracking-tight mb-1">Your pace</h2>
+          <p className="cosmic-heading text-3xl font-bold mb-2">{pace}</p>
           <p className="text-white/70 text-sm">
             {pace === 'Deliberate' ? 'You take your time, which is great for depth. Sessions are kept short (5 questions) and hints are one tap away.'
               : pace === 'Quick' ? 'You answer fast. Sessions are longer (12 questions) and the difficulty rises sooner.'
@@ -72,7 +72,7 @@ export const Dashboard = () => {
 
       <div className="grid lg:grid-cols-3 gap-4 mb-6">
         <Card className="lg:col-span-2">
-          <h2 className="text-xl font-semibold mb-3">Knowledge map</h2>
+          <h2 className="text-xl font-semibold tracking-tight mb-3">Knowledge map</h2>
           {!view ? null : (
             <>
               <svg viewBox="0 0 400 220" className="w-full h-auto" aria-hidden>
@@ -95,7 +95,7 @@ export const Dashboard = () => {
           )}
         </Card>
         <Card>
-          <h2 className="text-xl font-semibold mb-3">Strengths & focus</h2>
+          <h2 className="text-xl font-semibold tracking-tight mb-3">Strengths & focus</h2>
           {!view || (view.strong.length === 0 && view.weak.length === 0) ? <p className="text-white/70 text-sm">Answer a few questions in two or more topics and your strengths and weak spots will show up here.</p> : (
             <div className="space-y-4">
               {view.strong.length > 0 && <div><p className="flex items-center gap-2 text-sm text-white/70 mb-1"><TrendingUp className="w-4 h-4" aria-hidden />Strongest</p>{view.strong.map((t) => <p key={t.topic} className="text-sm">{t.topic} <span className="text-white/70">· {Math.round(t.mastery * 100)}%</span></p>)}</div>}
@@ -106,7 +106,7 @@ export const Dashboard = () => {
       </div>
 
       <Card>
-        <h2 className="text-xl font-semibold mb-3">Mastery by topic</h2>
+        <h2 className="text-xl font-semibold tracking-tight mb-3">Mastery by topic</h2>
         {!view ? null : (
           <ul className="grid md:grid-cols-2 gap-x-8 gap-y-3">
             {[...view.sum].sort((a, b) => a.subject.localeCompare(b.subject)).map((t) => (

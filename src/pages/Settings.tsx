@@ -1,374 +1,87 @@
-import { Sidebar } from '../components/Sidebar';
-import { User, Bell, Palette, Shield, Globe, Camera } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
+import { Download, Upload, Trash2 } from 'lucide-react';
+import { Page, Card, btnPrimary, btnGhost } from '../components/Page';
+import { exportAll, importAll, resetAll, storageBytes, updateSettings, useSettings } from '../engine/store';
+import { isLocalUrl } from '../engine/tutor';
+import { canSpeak, speak } from '../engine/speech';
 
-interface SettingsData {
-  profile: {
-    displayName: string;
-    email: string;
-    profilePic: string;
-  };
-  notifications: {
-    dailyReminders: boolean;
-    achievementUnlocked: boolean;
-    streakAlerts: boolean;
-    missionUpdates: boolean;
-  };
-  appearance: {
-    theme: string;
-  };
-  language: string;
-}
+const Toggle = ({ label, hint, checked, onChange }: { label: string; hint?: string; checked: boolean; onChange: (v: boolean) => void }) => (
+  <label className="flex items-start justify-between gap-4 py-3 border-b border-white/10 last:border-0 cursor-pointer">
+    <span><span className="block font-medium">{label}</span>{hint && <span className="block text-sm text-white/70">{hint}</span>}</span>
+    <input type="checkbox" role="switch" checked={checked} onChange={(e) => onChange(e.target.checked)} className="w-6 h-6 mt-1 accent-cyan-300 shrink-0" />
+  </label>
+);
 
 export const Settings = () => {
-  const [settings, setSettings] = useState<SettingsData>({
-    profile: {
-      displayName: 'Zero',
-      email: 'zero@stellarlearn.space',
-      profilePic: 'https://res.cloudinary.com/dhn92qb61/image/upload/v1751381563/Gojo__o3vpim.webp'
-    },
-    notifications: {
-      dailyReminders: true,
-      achievementUnlocked: true,
-      streakAlerts: true,
-      missionUpdates: true
-    },
-    appearance: {
-      theme: 'Cosmic Dark'
-    },
-    language: 'English'
-  });
+  const s = useSettings();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [msg, setMsg] = useState('');
+  const kb = (storageBytes() / 1024).toFixed(1);
 
-  const [isSaved, setIsSaved] = useState(false);
-
-  // Load settings from localStorage on component mount
-  useEffect(() => {
-    const savedSettings = localStorage.getItem('student_matrixSettings');
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
-    }
-  }, []);
-
-  // Save settings to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('stellarLearnSettings', JSON.stringify(settings));
-  }, [settings]);
-
-  const GlassCard = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-    <div className={`backdrop-blur-md bg-white/5 border border-white/10 rounded-3xl ${className}`}>
-      {children}
-    </div>
-  );
-
-  const handleSaveSettings = () => {
-    setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 2000);
+  const download = () => {
+    const url = URL.createObjectURL(new Blob([exportAll()], { type: 'application/json' }));
+    const a = document.createElement('a'); a.href = url; a.download = `student_matrix-backup-${new Date().toISOString().slice(0, 10)}.json`; a.click();
+    URL.revokeObjectURL(url);
   };
-
-  const handleProfilePicChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setSettings(prev => ({
-          ...prev,
-          profile: {
-            ...prev.profile,
-            profilePic: e.target?.result as string
-          }
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
+  const upload = async (f?: File) => {
+    if (!f) return;
+    try { importAll(await f.text()); setMsg('Backup restored.'); } catch (e) { setMsg(`Could not restore: ${(e as Error).message}`); }
+    if (fileRef.current) fileRef.current.value = '';
   };
-
-  // Fixed handleInputChange function
-  const handleInputChange = (section: keyof SettingsData, field: string, value: any) => {
-    setSettings(prev => {
-      if (section === 'language') {
-        return {
-          ...prev,
-          language: value
-        };
-      }
-      
-      return {
-        ...prev,
-        [section]: {
-          ...(prev[section] as any),
-          [field]: value
-        }
-      };
-    });
-  };
-
-  const handleNotificationToggle = (notification: keyof SettingsData['notifications']) => {
-    setSettings(prev => ({
-      ...prev,
-      notifications: {
-        ...prev.notifications,
-        [notification]: !prev.notifications[notification]
-      }
-    }));
-  };
-
-  const themes = ['Cosmic Dark', 'Nebula Gray', 'Stellar White'];
-  const languages = ['English', 'Spanish', 'French', 'German', 'Japanese', 'Chinese'];
+  const llmBad = s.localLlmUrl !== '' && !isLocalUrl(s.localLlmUrl);
 
   return (
-    <div className="flex min-h-screen bg-black">
-      <Sidebar />
-      
-      <main className="flex-1 p-4 md:p-8 pt-20 md:pt-8">
-        <div className="max-w-4xl mx-auto space-y-8">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Settings</h1>
-              <p className="text-white/60 capitalize">Customize your learning experience</p>
-            </div>
-            
-            <button
-              onClick={handleSaveSettings}
-              className={`px-6 py-3 rounded-2xl border transition-all duration-300 ${
-                isSaved 
-                  ? 'border-white bg-white text-black' 
-                  : 'border-white/20 bg-white/10 text-white hover:bg-white/20'
-              }`}
-            >
-              {isSaved ? '✓ Saved' : 'Save Changes'}
-            </button>
+    <Page title="Settings" subtitle="Accessibility, performance and privacy controls.">
+      <div className="grid lg:grid-cols-2 gap-4">
+        <Card className="glass-hover glass-hover">
+          <h2 className="text-xl font-semibold tracking-tight mb-3">Profile & goals</h2>
+          <label htmlFor="name" className="block text-sm text-white/70 mb-1">Your name</label>
+          <input id="name" value={s.name} maxLength={30} onChange={(e) => updateSettings({ name: e.target.value })} className="w-full rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-3 mb-4" />
+          <label htmlFor="goal" className="block text-sm text-white/70 mb-1">Daily goal: {s.dailyGoal} questions</label>
+          <input id="goal" type="range" min={3} max={40} value={s.dailyGoal} onChange={(e) => updateSettings({ dailyGoal: Number(e.target.value) })} className="w-full accent-cyan-300" />
+        </Card>
+
+        <Card className="glass-hover glass-hover">
+          <h2 className="text-xl font-semibold tracking-tight mb-1">Accessibility</h2>
+          <label htmlFor="scale" className="block text-sm text-white/70 mt-2 mb-1">Text size: {Math.round(s.textScale * 100)}%</label>
+          <input id="scale" type="range" min={0.9} max={1.5} step={0.05} value={s.textScale} onChange={(e) => updateSettings({ textScale: Number(e.target.value) })} className="w-full accent-cyan-300 mb-2" />
+          <Toggle label="Dyslexia-friendly text" hint="Wider spacing and a clear, high-legibility font" checked={s.dyslexiaFont} onChange={(v) => updateSettings({ dyslexiaFont: v })} />
+          <Toggle label="High contrast" checked={s.highContrast} onChange={(v) => updateSettings({ highContrast: v })} />
+          <Toggle label="Reduce motion" checked={s.reduceMotion} onChange={(v) => updateSettings({ reduceMotion: v })} />
+          <Toggle label="Read questions and answers aloud" hint={canSpeak() ? 'Uses your device’s built-in voice — works offline' : 'Not supported by this browser'} checked={s.speak && canSpeak()} onChange={(v) => updateSettings({ speak: v })} />
+          {canSpeak() && <div className="mt-2"><label htmlFor="rate" className="block text-sm text-white/70 mb-1">Speech speed: {s.speechRate.toFixed(1)}×</label>
+            <input id="rate" type="range" min={0.6} max={1.6} step={0.1} value={s.speechRate} onChange={(e) => updateSettings({ speechRate: Number(e.target.value) })} className="w-full accent-cyan-300" />
+            <button className={`${btnGhost} mt-2`} onClick={() => speak('This is how I will sound.', s.speechRate)}>Test voice</button></div>}
+        </Card>
+
+        <Card className="glass-hover glass-hover">
+          <h2 className="text-xl font-semibold tracking-tight mb-1">Performance</h2>
+          <Toggle label="Lite mode (low-resource devices)" hint="Turns off blur effects, animations and decorative graphics to save battery and memory. Enabled automatically on low-memory devices." checked={s.liteMode} onChange={(v) => updateSettings({ liteMode: v })} />
+          <p className="text-sm text-white/70 mt-3">The app works fully offline after the first load and uses about {kb} KB of local storage for your progress.</p>
+        </Card>
+
+        <Card className="glass-hover glass-hover">
+          <h2 className="text-xl font-semibold tracking-tight mb-1">Optional local AI model</h2>
+          <p className="text-sm text-white/70 mb-3">The tutor already works without any model. If you run an Ollama server on this computer or your home network, the tutor can use it for fuller answers. Only localhost / private-network addresses are accepted, so your questions never go to the internet.</p>
+          <label htmlFor="llm" className="block text-sm text-white/70 mb-1">Server address</label>
+          <input id="llm" placeholder="http://localhost:11434" value={s.localLlmUrl} onChange={(e) => updateSettings({ localLlmUrl: e.target.value.trim() })} className="w-full rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-3 mb-1" aria-invalid={llmBad} />
+          {llmBad && <p className="text-rose-300 text-sm mb-2" role="alert">Only localhost or private-network addresses are allowed.</p>}
+          <label htmlFor="model" className="block text-sm text-white/70 mt-2 mb-1">Model name</label>
+          <input id="model" value={s.localLlmModel} onChange={(e) => updateSettings({ localLlmModel: e.target.value.trim() })} className="w-full rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-3" />
+        </Card>
+
+        <Card className="glass-hover lg:col-span-2">
+          <h2 className="text-xl font-semibold tracking-tight mb-1">Your data</h2>
+          <p className="text-sm text-white/70 mb-4">All progress, notes and settings are stored only in this browser. There is no account and no server. Export a backup to move to another device.</p>
+          <div className="flex flex-wrap gap-3">
+            <button className={btnPrimary} onClick={download}><Download className="inline w-4 h-4 mr-1" aria-hidden />Export backup</button>
+            <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={(e) => upload(e.target.files?.[0])} />
+            <button className={btnGhost} onClick={() => fileRef.current?.click()}><Upload className="inline w-4 h-4 mr-1" aria-hidden />Restore backup</button>
+            <button className={`${btnGhost} text-rose-300 border-rose-300/40`} onClick={() => { if (confirm('Delete all progress, notes and settings from this device? This cannot be undone.')) { resetAll(); setMsg('All data deleted.'); } }}><Trash2 className="inline w-4 h-4 mr-1" aria-hidden />Delete all data</button>
           </div>
-
-          <div className="space-y-6">
-            {/* Profile Settings */}
-            <GlassCard className="p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-                  <User className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-white">Profile</h2>
-                  <p className="text-sm text-white/60">Manage your account information</p>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                {/* Profile Picture Upload */}
-                <div className="flex items-center gap-6">
-                  <div className="relative">
-                    <div className="w-20 h-20 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center overflow-hidden">
-                      {settings.profile.profilePic ? (
-                        <img 
-                          src={settings.profile.profilePic} 
-                          alt="Profile" 
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <User className="w-8 h-8 text-white/60" />
-                      )}
-                    </div>
-                    <label 
-                      htmlFor="profilePic"
-                      className="absolute -bottom-1 -right-1 w-8 h-8 bg-white border-2 border-black rounded-full flex items-center justify-center cursor-pointer hover:bg-white/90 transition-colors"
-                    >
-                      <Camera className="w-4 h-4 text-black" />
-                    </label>
-                    <input
-                      id="profilePic"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleProfilePicChange}
-                      className="hidden"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-medium mb-1">Profile Picture</h3>
-                    <p className="text-white/60 text-sm">Upload a photo from your device</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-white/80 mb-2">Display Name</label>
-                    <input
-                      type="text"
-                      value={settings.profile.displayName}
-                      onChange={(e) => handleInputChange('profile', 'displayName', e.target.value)}
-                      className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 focus:border-white/50 focus:bg-white/10 outline-none text-white transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-white/80 mb-2">Email</label>
-                    <input
-                      type="email"
-                      value={settings.profile.email}
-                      onChange={(e) => handleInputChange('profile', 'email', e.target.value)}
-                      className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 focus:border-white/50 focus:bg-white/10 outline-none text-white transition-all"
-                    />
-                  </div>
-                </div>
-              </div>
-            </GlassCard>
-
-            {/* Notifications */}
-            <GlassCard className="p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-                  <Bell className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-white">Notifications</h2>
-                  <p className="text-sm text-white/60">Configure your alerts and reminders</p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {[
-                  { key: 'dailyReminders', label: 'Daily Reminders' },
-                  { key: 'achievementUnlocked', label: 'Achievement Unlocked' },
-                  { key: 'streakAlerts', label: 'Streak Alerts' },
-                  { key: 'missionUpdates', label: 'Mission Updates' }
-                ].map(({ key, label }) => (
-                  <label key={key} className="flex items-center justify-between cursor-pointer group p-3 rounded-2xl hover:bg-white/5 transition-colors">
-                    <span className="text-white group-hover:text-white/90 transition-colors">{label}</span>
-                    <div className="relative">
-                      <input 
-                        type="checkbox" 
-                        checked={settings.notifications[key as keyof SettingsData['notifications']]} 
-                        onChange={() => handleNotificationToggle(key as keyof SettingsData['notifications'])}
-                        className="sr-only peer" 
-                      />
-                      <div className="w-12 h-6 bg-white/10 rounded-full peer-checked:bg-white transition-all" />
-                      <div className="absolute left-1 top-1 w-4 h-4 bg-white/60 rounded-full transition-transform peer-checked:translate-x-6 peer-checked:bg-white" />
-                    </div>
-                  </label>
-                ))}
-              </div>
-            </GlassCard>
-
-            {/* Appearance */}
-            <GlassCard className="p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-                  <Palette className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-white">Appearance</h2>
-                  <p className="text-sm text-white/60">Customize the visual experience</p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-white/80 mb-3">Theme</label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {themes.map((theme) => (
-                      <button
-                        key={theme}
-                        onClick={() => handleInputChange('appearance', 'theme', theme)}
-                        className={`px-4 py-3 rounded-2xl border transition-all ${
-                          settings.appearance.theme === theme
-                            ? 'border-white bg-white/20 text-white'
-                            : 'border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:border-white/30'
-                        }`}
-                      >
-                        {theme}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </GlassCard>
-
-            {/* Language & Region */}
-            <GlassCard className="p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-                  <Globe className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-white">Language & Region</h2>
-                  <p className="text-sm text-white/60">Set your preferred language</p>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">Language</label>
-                <select 
-                  value={settings.language}
-                  onChange={(e) => setSettings(prev => ({ ...prev, language: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 focus:border-white/50 focus:bg-white/10 outline-none text-white transition-all"
-                >
-                  {languages.map(lang => (
-                    <option key={lang} value={lang}>{lang}</option>
-                  ))}
-                </select>
-              </div>
-            </GlassCard>
-
-            {/* Privacy & Security */}
-            <GlassCard className="p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-white">Privacy & Security</h2>
-                  <p className="text-sm text-white/60">Manage your data and security settings</p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <button className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/30 text-white text-left transition-all">
-                  Change Password
-                </button>
-                <button className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/30 text-white text-left transition-all">
-                  Download My Data
-                </button>
-                <button className="w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/20 hover:bg-red-500/10 hover:border-red-500/50 text-red-400 text-left transition-all">
-                  Delete Account
-                </button>
-              </div>
-            </GlassCard>
-
-            {/* Data Management */}
-            <GlassCard className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-1">Data Management</h3>
-                  <p className="text-white/60 text-sm">Clear all local storage data</p>
-                </div>
-                <button 
-                  onClick={() => {
-                    localStorage.removeItem('student_matrixSettings');
-                    setSettings({
-                      profile: {
-                        displayName: 'Explorer',
-                        email: 'explorer@student_matrix.space',
-                        profilePic: ''
-                      },
-                      notifications: {
-                        dailyReminders: true,
-                        achievementUnlocked: true,
-                        streakAlerts: true,
-                        missionUpdates: true
-                      },
-                      appearance: {
-                        theme: 'Cosmic Dark'
-                      },
-                      language: 'English'
-                    });
-                  }}
-                  className="px-4 py-2 rounded-2xl border border-white/20 bg-white/5 text-white hover:bg-white/10 transition-colors"
-                >
-                  Reset to Default
-                </button>
-              </div>
-            </GlassCard>
-          </div>
-        </div>
-      </main>
-    </div>
+          {msg && <p role="status" className="text-sm mt-3">{msg}</p>}
+        </Card>
+      </div>
+    </Page>
   );
 };

@@ -1,6 +1,6 @@
 export const Logo = ({ size = 40 }: { size?: number }) => {
   return (
-    <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
+    <div role="img" aria-label="student_matrix" className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
       <div
         className="absolute rounded-full bg-gradient-to-br from-[#00E5FF] to-[#5A00FF]"
         style={{ width: size * 0.6, height: size * 0.6 }}

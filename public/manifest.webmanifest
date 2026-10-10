@@ -1,0 +1,11 @@
+{
+  "name": "student_matrix",
+  "short_name": "student_matrix",
+  "description": "Private, offline, adaptive learning assistant",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#0A0F2D",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

@@ -1,435 +1,164 @@
-import { Sidebar } from '../components/Sidebar';
-import { Zap, Filter, Target, ChevronRight, Clock, Star, Lock, CheckCircle } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { CheckCircle2, XCircle, Lightbulb, Volume2, ArrowRight, RotateCcw } from 'lucide-react';
+import { Page, Card, btnPrimary, btnGhost } from '../components/Page';
+import { profileStore, updateProfile, useProfile, useSettings } from '../engine/store';
+import { allQuestions, useStaticData } from '../engine/bank';
+import { fiftyFifty, paceLabel, pickNext, recordAnswer, recommend, sessionLength } from '../engine/adaptive';
+import { speak } from '../engine/speech';
+import type { Question } from '../engine/types';
 
-interface Question {
-  id: number;
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation: string;
-}
-
-interface Mission {
-  id: number;
-  title: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  xpReward: number;
-  progress: number;
-  subject: string;
-  estimatedTime: string;
-  questions: Question[];
-  completed: boolean;
-  locked: boolean;
-}
-
-interface MissionProgress {
-  missionId: number;
-  currentQuestion: number;
-  score: number;
-  completed: boolean;
-  answers: number[];
-}
+interface Result { q: Question; chosen: number; correct: boolean; xp: number }
 
 export const Quests = () => {
-  const navigate = useNavigate();
-  const [filter, setFilter] = useState<'all' | 'Easy' | 'Medium' | 'Hard'>('all');
-  const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showExplanation, setShowExplanation] = useState(false);
-  const [score, setScore] = useState(0);
-  const [missions, setMissions] = useState<Mission[]>([]);
-  const [loading, setLoading] = useState(true);
+  const nav = useNavigate();
+  const [params] = useSearchParams();
+  const p = useProfile();
+  const settings = useSettings();
+  const { data, error } = useStaticData();
+  const bank = useMemo(() => (data ? allQuestions(data, p) : []), [data, p.notes]); // eslint-disable-line react-hooks/exhaustive-deps
+  const topics = useMemo(() => [...new Set(bank.map((q) => q.topic))], [bank]);
 
-  // Load missions from JSON file
+  const [topic, setTopic] = useState(params.get('topic') ?? '');
+  const [len, setLen] = useState(0);
+  const [phase, setPhase] = useState<'setup' | 'run' | 'done'>('setup');
+  const [q, setQ] = useState<Question | null>(null);
+  const [sel, setSel] = useState<number | null>(null);
+  const [visible, setVisible] = useState<number[] | null>(null);
+  const [results, setResults] = useState<Result[]>([]);
+  const [startMastery, setStartMastery] = useState<Record<string, number>>({});
+  const started = useRef(0);
+  const used = useRef<Set<string>>(new Set());
+  const [total, setTotal] = useState(8); // frozen at session start so pace updates cannot change it mid-session
+  const choice = len || sessionLength(p.paceFactor);
+
+  const next = useCallback(() => {
+    const nq = pickNext(bank, profileStore.get(), { topic: topic || undefined, exclude: used.current });
+    if (!nq) { setPhase('done'); return; }
+    used.current.add(nq.id);
+    setQ(nq); setSel(null); setVisible(null); started.current = Date.now();
+    if (settings.speak) speak(`${nq.text}. ${nq.options.map((o, i) => `Option ${i + 1}: ${o}`).join('. ')}`, settings.speechRate);
+  }, [bank, topic, settings.speak, settings.speechRate]);
+
+  const start = () => {
+    used.current = new Set(); setResults([]);
+    const snap: Record<string, number> = {};
+    Object.entries(profileStore.get().topics).forEach(([k, v]) => { snap[k] = v.mastery; });
+    setTotal(choice); setStartMastery(snap); setPhase('run'); next();
+  };
+
+  const submit = useCallback((choice: number) => {
+    if (!q || sel !== null) return;
+    setSel(choice);
+    const r = recordAnswer(profileStore.get(), q, choice, Date.now() - started.current, visible !== null);
+    updateProfile(() => r.profile);
+    setResults((x) => [...x, { q, chosen: choice, correct: choice === q.answer, xp: r.xpGained }]);
+  }, [q, sel, visible]);
+
+  const advance = useCallback(() => {
+    if (results.length >= total) {
+      const ok = results.every((r) => r.correct);
+      updateProfile((pp) => ({ ...pp, sessions: pp.sessions + 1, perfectSessions: pp.perfectSessions + (ok && results.length >= 5 ? 1 : 0) }));
+      setPhase('done');
+    } else next();
+  }, [results, total, next]);
+
   useEffect(() => {
-    const loadMissions = async () => {
-      try {
-        const response = await fetch('/data/quests.json');
-        const data = await response.json();
-        
-        // Load progress from localStorage
-        const savedProgress = localStorage.getItem('missionProgress');
-        const progress: MissionProgress[] = savedProgress ? JSON.parse(savedProgress) : [];
-        
-        // Merge missions with saved progress
-        const missionsWithProgress = data.missions.map((mission: Mission) => {
-          const missionProgress = progress.find(p => p.missionId === mission.id);
-          return {
-            ...mission,
-            progress: missionProgress ? 
-              Math.round((missionProgress.currentQuestion / mission.questions.length) * 100) : 
-              mission.progress,
-            completed: missionProgress?.completed || false
-          };
-        });
-        
-        setMissions(missionsWithProgress);
-      } catch (error) {
-        console.error('Error loading missions:', error);
-      } finally {
-        setLoading(false);
-      }
+    if (phase !== 'run' || !q) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
+      const n = Number(e.key);
+      if (sel === null && n >= 1 && n <= q.options.length && (!visible || visible.includes(n - 1))) submit(n - 1);
+      else if (sel !== null && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); advance(); }
     };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [phase, q, sel, visible, submit, advance]);
 
-    loadMissions();
-  }, []);
+  if (error) return <Page title="Practice"><Card>Could not load questions: {error}</Card></Page>;
+  if (!data) return <Page title="Practice"><Card>Loading…</Card></Page>;
 
-  // Save progress to localStorage
-  const saveProgress = (missionId: number, currentQuestion: number, score: number, completed: boolean, answers: number[]) => {
-    const savedProgress = localStorage.getItem('missionProgress');
-    const progress: MissionProgress[] = savedProgress ? JSON.parse(savedProgress) : [];
-    
-    const existingIndex = progress.findIndex(p => p.missionId === missionId);
-    const newProgress: MissionProgress = {
-      missionId,
-      currentQuestion,
-      score,
-      completed,
-      answers
-    };
-
-    if (existingIndex >= 0) {
-      progress[existingIndex] = newProgress;
-    } else {
-      progress.push(newProgress);
-    }
-
-    localStorage.setItem('missionProgress', JSON.stringify(progress));
-    
-    // Update missions state with new progress
-    setMissions(prev => prev.map(mission => 
-      mission.id === missionId 
-        ? { 
-            ...mission, 
-            progress: Math.round((currentQuestion / mission.questions.length) * 100),
-            completed 
-          }
-        : mission
-    ));
-  };
-
-  const filteredMissions = filter === 'all'
-    ? missions
-    : missions.filter(m => m.difficulty === filter);
-
-  const GlassCard = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-    <div className={`backdrop-blur-md bg-white/5 border border-white/10 rounded-3xl ${className}`}>
-      {children}
-    </div>
-  );
-
-  const handleMissionClick = (mission: Mission) => {
-    if (mission.locked) return;
-    
-    // Load saved progress for this mission
-    const savedProgress = localStorage.getItem('missionProgress');
-    const progress: MissionProgress[] = savedProgress ? JSON.parse(savedProgress) : [];
-    const missionProgress = progress.find(p => p.missionId === mission.id);
-    
-    setSelectedMission(mission);
-    setCurrentQuestion(missionProgress?.currentQuestion || 0);
-    setSelectedAnswer(null);
-    setShowExplanation(false);
-    setScore(missionProgress?.score || 0);
-  };
-
-  const handleAnswerSelect = (answerIndex: number) => {
-    if (!selectedMission) return;
-    
-    setSelectedAnswer(answerIndex);
-    const isCorrect = answerIndex === selectedMission.questions[currentQuestion].correctAnswer;
-    const newScore = isCorrect ? score + 1 : score;
-    setScore(newScore);
-    
-    // Save progress immediately
-    const answers = Array(currentQuestion + 1).fill(null);
-    answers[currentQuestion] = answerIndex;
-    saveProgress(
-      selectedMission.id,
-      currentQuestion,
-      newScore,
-      false,
-      answers
-    );
-  };
-
-  const handleNextQuestion = () => {
-    if (!selectedMission) return;
-    
-    const nextQuestion = currentQuestion + 1;
-    const isCompleted = nextQuestion >= selectedMission.questions.length;
-    
-    if (isCompleted) {
-      // Mission completed
-      saveProgress(
-        selectedMission.id,
-        nextQuestion,
-        score,
-        true,
-        Array(selectedMission.questions.length).fill(0).map((_, i) => 
-          i === currentQuestion ? selectedAnswer! : 0
-        )
-      );
-      setSelectedMission(null);
-    } else {
-      setCurrentQuestion(nextQuestion);
-      setSelectedAnswer(null);
-      setShowExplanation(false);
-    }
-  };
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Easy': return 'text-white bg-white/20';
-      case 'Medium': return 'text-white bg-white/30';
-      case 'Hard': return 'text-white bg-white/40';
-      default: return 'text-white bg-white/20';
-    }
-  };
-
-  if (loading) {
+  if (phase === 'setup') {
+    const label = paceLabel(p.paceFactor);
     return (
-      <div className="flex min-h-screen bg-black">
-        <Sidebar />
-        <main className="flex-1 p-4 md:p-8 pt-20 md:pt-8 flex items-center justify-center">
-          <div className="text-white text-xl">Loading Missions...</div>
-        </main>
-      </div>
+      <Page title="Adaptive Practice" subtitle="Questions are chosen to be challenging but achievable, based on your answers so far.">
+        <Card className="max-w-2xl space-y-5">
+          <div>
+            <label htmlFor="topic" className="block text-sm text-white/70 mb-1">What to practise</label>
+            <select id="topic" value={topic} onChange={(e) => setTopic(e.target.value)} className="w-full rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-3">
+              <option value="">Smart mix — focus on what I need most</option>
+              {topics.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+          <div>
+            <p className="text-sm text-white/70 mb-1">Session length <span className="text-white/60">(suggested {sessionLength(p.paceFactor)} for a {label.toLowerCase()} pace)</span></p>
+            <div className="flex gap-2" role="group" aria-label="Session length">
+              {[5, 8, 12].map((n) => <button key={n} onClick={() => setLen(n)} aria-pressed={choice === n} className={choice === n ? btnPrimary : btnGhost}>{n}</button>)}
+            </div>
+          </div>
+          <button className={btnPrimary} onClick={start} disabled={bank.length === 0}>Start session</button>
+          <p className="text-white/60 text-xs">Tip: press 1–4 to answer and Enter for the next question.</p>
+        </Card>
+      </Page>
     );
   }
 
-  if (selectedMission) {
-    const question = selectedMission.questions[currentQuestion];
-    const isLastQuestion = currentQuestion === selectedMission.questions.length - 1;
-
+  if (phase === 'done') {
+    const right = results.filter((r) => r.correct).length;
+    const xp = results.reduce((a, r) => a + r.xp, 0);
+    const deltas = Object.entries(profileStore.get().topics).filter(([k]) => results.some((r) => r.q.topic === k)).map(([k, v]) => ({ k, d: Math.round((v.mastery - (startMastery[k] ?? 0.25)) * 100) }));
+    const recs = recommend(profileStore.get(), bank, 0).slice(0, 2);
     return (
-      <div className="flex min-h-screen bg-black">
-        <Sidebar />
-        
-        <main className="flex-1 p-4 md:p-8 pt-20 md:pt-8">
-          <div className="max-w-4xl mx-auto">
-            <GlassCard className="p-6">
-              {/* Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <button 
-                    onClick={() => setSelectedMission(null)}
-                    className="flex items-center gap-2 text-white/60 hover:text-white transition-colors mb-2"
-                  >
-                    <ChevronRight className="w-4 h-4 rotate-180" />
-                    Back to Missions
-                  </button>
-                  <h1 className="text-2xl font-bold text-white">{selectedMission.title}</h1>
-                  <p className="text-white/60">{selectedMission.subject} • {selectedMission.difficulty}</p>
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-4 text-sm text-white/60">
-                    <span>Question {currentQuestion + 1} of {selectedMission.questions.length}</span>
-                    <span>Score: {score}/{selectedMission.questions.length}</span>
-                  </div>
-                  <div className="w-32 bg-white/10 rounded-full h-2 mt-2">
-                    <div 
-                      className="bg-white h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${((currentQuestion + 1) / selectedMission.questions.length) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Question */}
-              <GlassCard className="p-6 mb-6">
-                <h2 className="text-xl font-bold text-white mb-4">{question.question}</h2>
-                <div className="space-y-3">
-                  {question.options.map((option, index) => (
-                    <button
-                      key={index}
-                      onClick={() => !showExplanation && handleAnswerSelect(index)}
-                      className={`
-                        w-full p-4 text-left rounded-2xl border transition-all duration-300
-                        ${selectedAnswer === index
-                          ? index === question.correctAnswer
-                            ? 'bg-white/20 border-white text-white'
-                            : 'bg-white/10 border-white/30 text-white/60'
-                          : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
-                        }
-                        ${showExplanation && index === question.correctAnswer
-                          ? 'bg-white/20 border-white text-white'
-                          : ''
-                        }
-                      `}
-                      disabled={showExplanation}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`
-                          w-6 h-6 rounded-full border-2 flex items-center justify-center text-sm font-medium
-                          ${selectedAnswer === index || (showExplanation && index === question.correctAnswer)
-                            ? 'bg-white border-white text-black'
-                            : 'bg-transparent border-white/30 text-white/60'
-                          }
-                        `}>
-                          {String.fromCharCode(65 + index)}
-                        </div>
-                        {option}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </GlassCard>
-
-              {/* Explanation */}
-              {showExplanation && (
-                <GlassCard className="p-6 mb-6 border-white/20">
-                  <h3 className="text-lg font-bold text-white mb-3">Explanation</h3>
-                  <p className="text-white/80 leading-relaxed">{question.explanation}</p>
-                </GlassCard>
-              )}
-
-              {/* Actions */}
-              <div className="flex gap-4">
-                {!showExplanation && selectedAnswer !== null && (
-                  <button
-                    onClick={() => setShowExplanation(true)}
-                    className="flex-1 bg-white text-black py-3 rounded-2xl font-medium hover:bg-white/90 transition-all duration-300"
-                  >
-                    Show Explanation
-                  </button>
-                )}
-                {showExplanation && (
-                  <button
-                    onClick={handleNextQuestion}
-                    className="flex-1 bg-white text-black py-3 rounded-2xl font-medium hover:bg-white/90 transition-all duration-300"
-                  >
-                    {isLastQuestion ? 'Complete Mission' : 'Next Question'}
-                  </button>
-                )}
-              </div>
-            </GlassCard>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex min-h-screen bg-black">
-      <Sidebar />
-      
-      <main className="flex-1 p-4 md:p-8 pt-20 md:pt-8">
-        <div className="max-w-7xl mx-auto space-y-8">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Mission Quests</h1>
-              <p className="text-white/60 capitalize">Choose your next learning adventure</p>
-            </div>
-            <button 
-              onClick={() => navigate('/quests')}
-              className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-2xl font-medium hover:bg-white/90 transition-all duration-300"
-            >
-              <Zap className="w-4 h-4" />
-              Daily Challenge
-            </button>
-          </div>
-
-          {/* Filters */}
-          <GlassCard className="p-6">
-            <div className="flex flex-col md:flex-row md:items-center gap-4">
-              <div className="flex items-center gap-3">
-                <Filter className="w-5 h-5 text-white/60" />
-                <span className="text-white font-medium">Filter by:</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {(['all', 'Easy', 'Medium', 'Hard'] as const).map((level) => (
-                  <button
-                    key={level}
-                    onClick={() => setFilter(level)}
-                    className={`
-                      px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-300 border
-                      ${filter === level
-                        ? 'bg-white text-black border-white shadow-lg shadow-white/20'
-                        : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20'
-                      }
-                    `}
-                  >
-                    {level === 'all' ? 'All Missions' : level}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </GlassCard>
-
-          {/* Missions Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMissions.map((mission) => (
-              <GlassCard key={mission.id} className="p-6 hover:bg-white/10 transition-all duration-300 cursor-pointer">
-                <div onClick={() => handleMissionClick(mission)}>
-                  {/* Mission Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-white mb-2">{mission.title}</h3>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(mission.difficulty)}`}>
-                          {mission.difficulty}
-                        </span>
-                        <span className="text-white/60 text-sm">{mission.subject}</span>
-                      </div>
-                    </div>
-                    {mission.locked && (
-                      <Lock className="w-5 h-5 text-white/40" />
-                    )}
-                    {mission.completed && (
-                      <CheckCircle className="w-5 h-5 text-white" />
-                    )}
-                  </div>
-
-                  {/* Progress */}
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-white/60">Progress</span>
-                      <span className="text-white font-medium">{mission.progress}%</span>
-                    </div>
-                    <div className="w-full bg-white/10 rounded-full h-2">
-                      <div 
-                        className="bg-white h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${mission.progress}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Mission Info */}
-                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                    <div className="flex items-center gap-4 text-sm">
-                      <div className="flex items-center gap-1 text-white/60">
-                        <Star className="w-4 h-4" />
-                        <span>{mission.xpReward} XP</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-white/60">
-                        <Clock className="w-4 h-4" />
-                        <span>{mission.estimatedTime}</span>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-white/40" />
-                  </div>
-                </div>
-              </GlassCard>
-            ))}
-          </div>
-
-          {/* Empty State */}
-          {filteredMissions.length === 0 && (
-            <GlassCard className="text-center py-20">
-              <div className="w-32 h-32 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-6">
-                <Target className="w-16 h-16 text-white/40" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">No missions found</h3>
-              <p className="text-white/60">Try adjusting your filters</p>
-            </GlassCard>
+      <Page title="Session complete">
+        <Card className="max-w-2xl space-y-4">
+          <p className="cosmic-heading text-4xl font-bold">{right}/{results.length}</p>
+          <p className="text-white/70">+{xp} XP · {results.length ? Math.round((right / results.length) * 100) : 0}% correct</p>
+          {deltas.map(({ k, d }) => <p key={k} className="text-sm">{k}: mastery {d >= 0 ? '+' : ''}{d}%</p>)}
+          {results.some((r) => !r.correct) && (
+            <div><h2 className="font-semibold mb-2">To review</h2><ul className="space-y-2 text-sm text-white/80">
+              {results.filter((r) => !r.correct).map((r) => <li key={r.q.id}><span className="text-white">{r.q.text}</span><br />Answer: {r.q.options[r.q.answer]}. {r.q.explanation}</li>)}
+            </ul></div>
           )}
+          {recs.length > 0 && <div><h2 className="font-semibold mb-1">Next</h2>{recs.map((r) => <button key={r.title} onClick={() => nav(r.path)} className="block text-left text-sm underline text-cyan-200 mb-1">{r.title}</button>)}</div>}
+          <div className="flex gap-3"><button className={btnPrimary} onClick={() => { setPhase('setup'); }}><RotateCcw className="inline w-4 h-4 mr-1" aria-hidden />Another session</button><button className={btnGhost} onClick={() => nav('/dashboard')}>Dashboard</button></div>
+        </Card>
+      </Page>
+    );
+  }
+
+  if (!q) return <Page title="Practice"><Card>No questions available for this choice.</Card></Page>;
+  const shown = visible ?? q.options.map((_, i) => i);
+  return (
+    <Page title="Adaptive Practice" subtitle={`${q.topic} · question ${Math.min(results.length + (sel === null ? 1 : 0), total)} of ${total}`}>
+      <Card className="max-w-3xl space-y-4">
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="text-xl font-semibold tracking-tight" id="qtext">{q.text}</h2>
+          <button className={btnGhost} aria-label="Read question aloud" onClick={() => speak(`${q.text}. ${q.options.map((o, i) => `Option ${i + 1}: ${o}`).join('. ')}`, settings.speechRate)}><Volume2 className="w-4 h-4" /></button>
         </div>
-      </main>
-    </div>
+        <div role="group" aria-labelledby="qtext" className="space-y-2">
+          {shown.map((i) => {
+            const o = q.options[i];
+            const state = sel === null ? '' : i === q.answer ? 'border-emerald-400 bg-emerald-400/15' : i === sel ? 'border-rose-400 bg-rose-400/15' : 'opacity-60';
+            return (
+              <button key={i} disabled={sel !== null} onClick={() => submit(i)} className={`w-full text-left p-4 rounded-2xl border border-white/20 hover:bg-white/10 disabled:hover:bg-transparent ${state}`}>
+                <span className="text-white/60 mr-2">{i + 1}.</span>{o}
+                {sel !== null && i === q.answer && <CheckCircle2 className="inline w-4 h-4 ml-2 text-emerald-300" aria-label="correct" />}
+                {sel !== null && i === sel && i !== q.answer && <XCircle className="inline w-4 h-4 ml-2 text-rose-300" aria-label="incorrect" />}
+              </button>
+            );
+          })}
+        </div>
+        {sel === null ? (
+          <button className={btnGhost} disabled={visible !== null} onClick={() => setVisible(fiftyFifty(q))}><Lightbulb className="inline w-4 h-4 mr-1" aria-hidden />Hint: remove two wrong answers (half XP)</button>
+        ) : (
+          <div role="status" className="p-4 rounded-2xl glass-hover bg-white/5 border border-white/10">
+            <p className="font-semibold mb-1">{sel === q.answer ? 'Correct!' : 'Not quite.'}</p>
+            <p className="text-white/80">{q.explanation}</p>
+            {sel !== q.answer && <p className="text-white/70 text-sm mt-2">This will come back later in a new session so you can lock it in.</p>}
+            <button className={`${btnPrimary} mt-3`} onClick={advance} autoFocus>{results.length >= total ? 'Finish' : 'Next'} <ArrowRight className="inline w-4 h-4" aria-hidden /></button>
+          </div>
+        )}
+      </Card>
+    </Page>
   );
 };

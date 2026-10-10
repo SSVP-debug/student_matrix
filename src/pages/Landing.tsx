@@ -1,404 +1,488 @@
-import { Rocket, Sparkles, Target, Users, BookOpen, MessageCircle, FileText, ChevronRight, Play} from 'lucide-react';
+import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Rocket,
+  Sparkles,
+  Target,
+  ShieldCheck,
+  BookOpen,
+  Bot,
+  Layers,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  User,
+  Lock,
+  ArrowRight,
+  Atom,
+} from 'lucide-react';
 import { Logo } from '../components/Logo';
+import { btnPrimary } from '../components/Page';
+import { useSettings, updateSettings } from '../engine/store';
 
 export const Landing = () => {
   const navigate = useNavigate();
+  const currentSettings = useSettings();
+
+  // Authentication State
+  const [authMode, setAuthMode] = useState<'signin' | 'register'>('signin');
+  const [name, setName] = useState(currentSettings.name !== 'Learner' ? currentSettings.name : '');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [dailyGoal, setDailyGoal] = useState(currentSettings.dailyGoal || 10);
+  const [loading, setLoading] = useState(false);
+
+  const handleAuthSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    setTimeout(() => {
+      const learnerName = name.trim() || 'Cosmic Learner';
+      updateSettings({
+        name: learnerName,
+        dailyGoal,
+      });
+      setLoading(false);
+      navigate('/dashboard');
+    }, 400);
+  };
+
+  const handleGuestLaunch = () => {
+    navigate('/dashboard');
+  };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      {/* Animated Star Background */}
-      <div className="absolute inset-0">
-        {[...Array(100)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full bg-white animate-pulse"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              width: `${Math.random() * 3 + 1}px`,
-              height: `${Math.random() * 3 + 1}px`,
-              opacity: Math.random() * 0.8 + 0.2,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${Math.random() * 3 + 2}s`
-            }}
-          />
-        ))}
-      </div>
+    <div className="relative min-h-screen overflow-x-hidden bg-stellar-bg text-stellar-text selection:bg-stellar-violet/30 selection:text-white">
+      {/* Background Ambient Cosmic Starfield */}
+      <div className="absolute inset-0 stellar-stars opacity-45 pointer-events-none" />
 
-      {/* Navigation */}
-      <nav className="relative z-20 flex items-center justify-between px-5 md:px-8 py-5 md:py-6 max-w-7xl mx-auto">
+      {/* Atmospheric Radial Gradients */}
+      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full bg-stellar-violet/15 blur-[130px] pointer-events-none" />
+      <div className="absolute top-1/3 right-10 w-[500px] h-[500px] rounded-full bg-stellar-cyan/10 blur-[130px] pointer-events-none" />
+
+      {/* Header Navigation */}
+      <header className="relative z-30 flex items-center justify-between px-5 sm:px-8 py-5 max-w-7xl mx-auto border-b border-stellar-border/40 backdrop-blur-md">
         <div className="flex items-center gap-3">
-          <Logo size={48} />
-          <span className="text-2xl font-bold text-white">student_matrix</span>
+          <Logo size={42} showWordmark />
         </div>
+
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-stellar-secondary">
+          <a href="#features" className="hover:text-white transition-colors">
+            Features
+          </a>
+          <a href="#architecture" className="hover:text-white transition-colors">
+            Architecture
+          </a>
+          <a href="#privacy" className="hover:text-white transition-colors">
+            Privacy
+          </a>
+        </nav>
+
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/dashboard')}
-            className="border border-white/20 bg-white/[0.03] px-5 py-2 rounded-2xl font-medium text-white/80 backdrop-blur-sm transition-all duration-300 hover:border-cyan-200/30 hover:bg-white/10 hover:text-white"
+            onClick={handleGuestLaunch}
+            className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-stellar-secondary hover:text-white border border-stellar-border hover:bg-stellar-card transition-all"
           >
-            Dashboard
+            <span>Instant Explorer</span>
           </button>
           <button
-            onClick={() => navigate('/dashboard')}
-            className="cosmic-button bg-white px-6 py-2 rounded-2xl font-semibold text-black transition-all duration-300 hover:bg-cyan-50"
+            onClick={() => document.getElementById('auth-card')?.scrollIntoView({ behavior: 'smooth' })}
+            className="cosmic-button text-sm px-5 py-2 rounded-xl flex items-center gap-2"
           >
-            Start Learning
+            <span>Launch LearnAI</span>
+            <Rocket className="w-4 h-4" />
           </button>
         </div>
-      </nav>
+      </header>
 
-      {/* Hero Section */}
-      <section className="relative z-10 container mx-auto px-5 md:px-8 pt-8 pb-24 md:pb-32">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-8">
-            <div className="inline-block">
-              <div className="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-lg border border-white/10 rounded-full shadow-2xl">
-                <Sparkles className="w-4 h-4 text-white" />
-                <span className="text-sm text-white font-medium">AI-Powered Learning Platform</span>
+      {/* Hero & Two-Column Authentication Section */}
+      <section className="relative z-20 max-w-7xl mx-auto px-5 sm:px-8 pt-10 sm:pt-16 pb-20">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+          {/* Left Column: Vision & Planetary AI Orbit Visual */}
+          <div className="lg:col-span-7 space-y-8">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-stellar-violet/15 border border-stellar-violet/30 text-xs font-semibold text-stellar-purple shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-stellar-cyan" />
+              <span>Cosmic Personalized Learning Assistant</span>
+            </div>
+
+            <div className="space-y-4">
+              <h1 className="cosmic-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.08] tracking-tight">
+                Master Any Subject Across{' '}
+                <span className="cosmic-gradient-text">The Cosmos</span>
+              </h1>
+              <p className="text-base sm:text-lg text-stellar-secondary max-w-xl leading-relaxed">
+                LearnAI transforms your study journey into an intelligent cosmic expedition.
+                Experience on-device Bayesian adaptive quizzes, SM-2 spaced repetition, and a focused AI tutor that runs 100% privately on your machine.
+              </p>
+            </div>
+
+            {/* Original CSS Orbital Visual (no static images or copyrighted art) */}
+            <div className="relative py-4 hidden sm:block">
+              <div className="flex items-center gap-6">
+                <div className="relative w-28 h-28 shrink-0 flex items-center justify-center">
+                  {/* Outer orbit */}
+                  <div className="absolute inset-0 rounded-full border border-stellar-cyan/30 animate-spin-slow" />
+                  {/* Middle orbit */}
+                  <div className="absolute inset-2.5 rounded-full border border-stellar-violet/40 animate-spin-medium" />
+                  {/* Central radiant node */}
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-stellar-violet to-stellar-cyan flex items-center justify-center shadow-cyan-glow text-white">
+                    <Atom className="w-6 h-6 animate-pulse" />
+                  </div>
+                  {/* Satellite planet nodes */}
+                  <div className="absolute -top-1 left-1/2 w-3.5 h-3.5 rounded-full bg-stellar-cyan shadow-[0_0_8px_#38BDF8]" />
+                  <div className="absolute bottom-2 -right-1 w-2.5 h-2.5 rounded-full bg-stellar-purple shadow-[0_0_6px_#A78BFA]" />
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-white font-semibold text-sm">
+                    <ShieldCheck className="w-4 h-4 text-stellar-success" />
+                    <span>Zero Cloud Profiling · Offline First</span>
+                  </div>
+                  <p className="text-xs text-stellar-secondary leading-relaxed max-w-md">
+                    Everything—from PDF summarization to flashcard scheduling—is calculated locally in your browser. No servers track your mistakes.
+                  </p>
+                </div>
               </div>
             </div>
 
-            <h1 className="cosmic-heading text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.04]">
-              Learn Across{' '}
-              <span className="cosmic-gradient-text">
-                The Universe
-              </span>
-            </h1>
-
-            <p className="text-xl text-white/80 leading-relaxed max-w-xl capitalize">
-              Embark on an interstellar educational journey where every lesson is a mission, 
-              every topic a new galaxy, and every achievement a star in your cosmic constellation...
-            </p>
-
-            <div className="flex flex-wrap gap-4">
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="cosmic-button bg-white text-black px-8 py-4 rounded-2xl font-semibold hover:bg-cyan-50 transition-all duration-300 hover:scale-[1.02] flex items-center gap-2"
-              >
-                <span>Launch Learning</span>
-                <Rocket className="w-5 h-5" />
-              </button>
-              <button onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })} className="flex items-center gap-2 px-8 py-4 text-white border border-white/20 rounded-2xl hover:bg-white/5 transition-all duration-300 backdrop-blur-sm">
-                <Play className="w-5 h-5" />
-                Explore Features
-              </button>
-            </div>
-
-            <div className="flex items-center gap-8 pt-8">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-white">0+</div>
-                <div className="text-sm text-white/60">Cosmic Learners</div>
+            {/* Trust Badges Grid */}
+            <div className="grid grid-cols-3 gap-4 pt-2 max-w-lg border-t border-stellar-border/60">
+              <div className="space-y-0.5">
+                <div className="text-2xl font-bold text-white">100%</div>
+                <div className="text-xs text-stellar-muted">On-Device Privacy</div>
               </div>
-              <div className="w-px h-12 bg-gradient-to-b from-transparent via-white/30 to-transparent" />
-              <div className="text-center">
-                <div className="text-3xl font-bold text-white">0+</div>
-                <div className="text-sm text-white/60">Missions Completed</div>
+              <div className="space-y-0.5">
+                <div className="text-2xl font-bold text-stellar-cyan">BKT + Elo</div>
+                <div className="text-xs text-stellar-muted">Adaptive Algorithm</div>
               </div>
-              <div className="w-px h-12 bg-gradient-to-b from-transparent via-white/30 to-transparent" />
-              <div className="text-center">
-                <div className="text-3xl font-bold text-white">4.9/5</div>
-                <div className="text-sm text-white/60">Rating</div>
+              <div className="space-y-0.5">
+                <div className="text-2xl font-bold text-stellar-purple">SM-2</div>
+                <div className="text-xs text-stellar-muted">Spaced Repetition</div>
               </div>
             </div>
           </div>
 
-          {/* Monochromatic Hero Visual */}
-          <div className="relative h-[700px] hidden lg:block">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              {/* Massive Monochromatic Ring System */}
-              <div className="relative">
-                {/* Outer Ring */}
-                <div className="w-[600px] h-[600px] rounded-full border border-white/20 animate-spin-slow">
-                  <div className="absolute top-1/2 left-0 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg shadow-white/50" />
-                </div>
-                
-                {/* Middle Ring */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full border border-white/30 animate-spin-medium">
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rounded-full shadow-lg shadow-white/50" />
-                </div>
-                
-                {/* Inner Ring */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full border border-white/40 animate-spin-fast">
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rounded-full shadow-lg shadow-white/50" />
-                </div>
+          {/* Right Column: Clean Authentication Experience (Phase 11) */}
+          <div className="lg:col-span-5" id="auth-card">
+            <div className="glass-card p-6 sm:p-8 border border-stellar-border/80 shadow-2xl relative overflow-hidden backdrop-blur-2xl">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-stellar-violet/10 rounded-full blur-2xl pointer-events-none" />
 
-                {/* Central Astronaut */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <div className="relative w-64 h-64 rounded-full overflow-hidden border border-white/20 shadow-[0_0_80px_rgba(0,229,255,0.18)]">
-                    <img 
-                      src="/images/Pixie.webp" 
-                      alt="student_matrix cosmic learning illustration"
-                      className="w-full h-full object-cover rounded-full"
+              {/* Mode Toggle Header */}
+              <div className="flex rounded-xl bg-stellar-surface p-1 mb-6 border border-stellar-border">
+                <button
+                  type="button"
+                  onClick={() => setAuthMode('signin')}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                    authMode === 'signin'
+                      ? 'bg-stellar-violet text-white shadow-md'
+                      : 'text-stellar-secondary hover:text-white'
+                  }`}
+                >
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAuthMode('register')}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                    authMode === 'register'
+                      ? 'bg-stellar-violet text-white shadow-md'
+                      : 'text-stellar-secondary hover:text-white'
+                  }`}
+                >
+                  New Explorer
+                </button>
+              </div>
+
+              <div className="mb-5 space-y-1">
+                <h2 className="text-xl font-bold text-white tracking-tight">
+                  {authMode === 'signin' ? 'Welcome to LearnAI' : 'Create Learner Profile'}
+                </h2>
+                <p className="text-xs text-stellar-secondary">
+                  {authMode === 'signin'
+                    ? 'Enter your explorer handle or email to continue your streak.'
+                    : 'Configure your personalized study identity on this machine.'}
+                </p>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleAuthSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="auth-name" className="block text-xs font-semibold text-stellar-secondary mb-1.5">
+                    Learner Name or Email
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stellar-muted">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <input
+                      id="auth-name"
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="e.g. Alex or alex@cosmos.edu"
+                      className="w-full pl-10 pr-3.5 py-3 rounded-xl bg-stellar-surface border border-stellar-border focus:border-stellar-cyan/50 focus:ring-1 focus:ring-stellar-cyan/30 text-sm text-white placeholder-stellar-muted transition-all"
                     />
-                    {/* White glow effect */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-white/5 rounded-full blur-2xl" />
                   </div>
                 </div>
 
-              </div>
-            </div>
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label htmlFor="auth-pass" className="text-xs font-semibold text-stellar-secondary">
+                      Access Passcode / Password
+                    </label>
+                    <span className="text-[11px] text-stellar-muted">(Stored on device)</span>
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stellar-muted">
+                      <Lock className="w-4 h-4" />
+                    </div>
+                    <input
+                      id="auth-pass"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full pl-10 pr-10 py-3 rounded-xl bg-stellar-surface border border-stellar-border focus:border-stellar-cyan/50 focus:ring-1 focus:ring-stellar-cyan/30 text-sm text-white placeholder-stellar-muted transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-stellar-muted hover:text-white"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
 
-            {/* Monochromatic Background Orbs */}
-            <div className="absolute top-20 left-20 animate-float" style={{ animationDelay: '0.5s' }}>
-              <div className="w-32 h-32 rounded-full bg-white/5 blur-2xl" />
-            </div>
-            <div className="absolute bottom-32 right-32 animate-float" style={{ animationDelay: '1s' }}>
-              <div className="w-40 h-40 rounded-full bg-white/5 blur-2xl" />
-            </div>
-            <div className="absolute top-1/3 right-40 animate-float" style={{ animationDelay: '1.5s' }}>
-              <div className="w-24 h-24 rounded-full bg-white/10 blur-xl" />
+                {authMode === 'register' && (
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <label htmlFor="auth-goal" className="text-xs font-semibold text-stellar-secondary">
+                        Daily Question Target
+                      </label>
+                      <span className="font-bold text-xs text-stellar-cyan">{dailyGoal} questions / day</span>
+                    </div>
+                    <input
+                      id="auth-goal"
+                      type="range"
+                      min={5}
+                      max={30}
+                      value={dailyGoal}
+                      onChange={(e) => setDailyGoal(Number(e.target.value))}
+                      className="w-full accent-stellar-cyan"
+                    />
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="cosmic-button w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg"
+                >
+                  {loading ? (
+                    <span>Launching Spaceport…</span>
+                  ) : (
+                    <>
+                      <span>{authMode === 'signin' ? 'Enter Learning Realm' : 'Start Cosmic Adventure'}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {/* Instant Guest Mode */}
+              <div className="mt-4 pt-4 border-t border-stellar-border/60 text-center space-y-2">
+                <button
+                  type="button"
+                  onClick={handleGuestLaunch}
+                  className="text-xs font-semibold text-stellar-cyan hover:underline flex items-center justify-center gap-1 mx-auto"
+                >
+                  <span>Or enter immediately as Instant Explorer</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+                <p className="text-[11px] text-stellar-muted">
+                  No account setup required. You can export or reset your progress anytime in Settings.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="relative z-10 container mx-auto px-8 py-20">
-        <div className="text-center mb-20">
-          <h2 className="text-5xl font-bold text-white mb-6">
-            Why Choose <span className="text-white">student_matrix?</span>
+      {/* Three Pillars Features Section */}
+      <section id="features" className="relative z-20 max-w-7xl mx-auto px-5 sm:px-8 py-20 border-t border-stellar-border/40">
+        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
+          <span className="text-xs font-bold uppercase tracking-widest text-stellar-cyan">
+            Advanced Architecture
+          </span>
+          <h2 className="cosmic-heading text-3xl sm:text-4xl font-extrabold text-white">
+            Powered by Cognitive Science & On-Device AI
           </h2>
-          <p className="text-xl text-white/60 max-w-3xl mx-auto leading-relaxed capitalize">
-            Experience the future of education with our cosmic learning ecosystem designed to make 
-            every study session an interstellar adventure
+          <p className="text-sm sm:text-base text-stellar-secondary leading-relaxed">
+            Every feature in LearnAI is tuned to maximize long-term retention while eliminating digital distractions.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6">
           {[
             {
               icon: Target,
-              title: "Adaptive Practice",
-              description: "Questions adjust to your level and pace after every answer, focusing on your weak spots and fading memories."
+              title: 'Bayesian Knowledge Tracing',
+              desc: 'Estimates your exact probability of knowing each concept in real time, adapting question difficulty so you stay right in the zone of proximal development.',
+              badge: 'Adaptive Engine',
             },
             {
-              icon: Sparkles,
-              title: "On-device Tutor",
-              description: "Explanations, feedback and study recommendations are generated on your device, so it works with no internet."
+              icon: Bot,
+              title: 'Private AI Learning Tutor',
+              desc: 'Grounded retrieval assistant that answers questions using your lecture notes and textbook content. Works without an internet connection or sends prompts to local Ollama.',
+              badge: 'Offline Tutor',
             },
             {
-              icon: Users,
-              title: "Private by Design",
-              description: "No account, no tracking, no server. Your progress and notes never leave your device, and it runs smoothly on low-end phones."
-            }
-          ].map((feature, index) => (
-            <div key={index} className="group relative">
-              <div className="absolute inset-0 bg-white/5 rounded-[32px] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="glass glass-hover relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-[32px] p-8 transition-all duration-300 h-full">
-                <div className="w-20 h-20 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-2xl">
-                  <feature.icon className="w-10 h-10 text-white" />
+              icon: Layers,
+              title: 'Supermemo SM-2 Spaced Cards',
+              desc: 'Scientifically calculated review schedules. Tough concepts return quickly, while mastered knowledge fades into optimal review cycles.',
+              badge: 'Memory Retention',
+            },
+          ].map((f, i) => {
+            const Icon = f.icon;
+            return (
+              <div
+                key={i}
+                className="glass-card p-6 sm:p-7 space-y-4 border border-stellar-border hover:border-stellar-cyan/40 transition-all group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-stellar-surface border border-stellar-border flex items-center justify-center text-stellar-cyan group-hover:scale-110 group-hover:border-stellar-cyan/50 transition-all shadow-sm">
+                  <Icon className="w-6 h-6" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">{feature.title}</h3>
-                <p className="text-white/70 leading-relaxed text-lg">
-                  {feature.description}
-                </p>
+                <div className="space-y-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-stellar-purple">
+                    {f.badge}
+                  </span>
+                  <h3 className="text-lg font-bold text-white">{f.title}</h3>
+                  <p className="text-xs sm:text-sm text-stellar-secondary leading-relaxed">{f.desc}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
-      {/* Learning Galaxies Section */}
-      <section className="relative z-10 container mx-auto px-8 py-20">
-        <div className="text-center mb-20">
-          <h2 className="text-5xl font-bold text-white mb-6">
-            Powerful Learning <span className="text-white">Features</span>
+      {/* Feature Galaxy Grid */}
+      <section id="architecture" className="relative z-20 max-w-7xl mx-auto px-5 sm:px-8 py-20 border-t border-stellar-border/40">
+        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
+          <span className="text-xs font-bold uppercase tracking-widest text-stellar-purple">
+            Cosmic Tools Suite
+          </span>
+          <h2 className="cosmic-heading text-3xl sm:text-4xl font-extrabold text-white">
+            Everything You Need to Excel
           </h2>
-          <p className="text-xl text-white/60 max-w-3xl mx-auto capitalize">
-            Discover our comprehensive suite of tools designed to enhance your learning experience
-          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { 
-              name: 'Mission Quests', 
-              description: 'Embark on structured learning journeys with guided missions and challenges',
+            {
+              name: 'Adaptive Quests',
+              desc: 'Dynamic practice quizzes targeting weak spots with 50:50 hints and immediate feedback.',
+              path: '/quests',
               icon: Target,
-              path: '/quests'
             },
-            { 
-              name: 'LearnHub', 
-              description: 'Upload PDFs or YouTube videos to generate smart notes and practice questions',
-              icon: FileText,
-              path: '/learnhub'
-            },
-            { 
-              name: 'AI Mentor', 
-              description: 'Get instant help and explanations from our intelligent learning assistant',
-              icon: MessageCircle,
-              path: '/mentor'
-            },
-            { 
-              name: 'Flashcards', 
-              description: 'Master concepts with interactive flashcards and spaced repetition',
+            {
+              name: 'LearnHub',
+              desc: 'Upload PDFs or paste passages to generate study summaries, key concepts, and questions.',
+              path: '/learnhub',
               icon: BookOpen,
-              path: '/flashcards'
-            }
-          ].map((feature, index) => (
-            <div key={index} className="group relative">
-              <div className="absolute inset-0 bg-white/5 rounded-[28px] blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="glass glass-hover relative backdrop-blur-lg bg-white/5 border border-white/10 rounded-[28px] p-8 transition-all duration-300 h-full flex flex-col">
-                <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                  <feature.icon className="w-8 h-8 text-white" />
+            },
+            {
+              name: 'AI Companion',
+              desc: 'Multi-level explanations from simple analogies to deep academic analyses.',
+              path: '/mentor',
+              icon: Bot,
+            },
+            {
+              name: 'Spaced Flashcards',
+              desc: 'Interactive 3D flashcards with 4-point rating and due-date tracking.',
+              path: '/flashcards',
+              icon: Layers,
+            },
+          ].map((item, idx) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={idx}
+                className="glass-card p-6 flex flex-col justify-between border border-stellar-border hover:border-stellar-cyan/40 transition-all group"
+              >
+                <div className="space-y-3">
+                  <div className="w-10 h-10 rounded-xl bg-stellar-surface border border-stellar-border flex items-center justify-center text-stellar-cyan">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-bold text-white text-base">{item.name}</h3>
+                  <p className="text-xs text-stellar-secondary leading-relaxed">{item.desc}</p>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-4">{feature.name}</h3>
-                <p className="text-white/70 text-sm leading-relaxed mb-6 flex-grow">
-                  {feature.description}
-                </p>
-                <div className="mt-auto pt-4 border-t border-white/10">
-                  <button 
-                    onClick={() => navigate(feature.path)}
-                    className="text-sm text-white hover:text-white/80 transition-colors font-medium flex items-center gap-2 group/btn"
+                <div className="pt-5 mt-4 border-t border-stellar-border/50">
+                  <button
+                    onClick={() => navigate(item.path)}
+                    className="text-xs font-semibold text-stellar-cyan hover:underline flex items-center gap-1 group/btn"
                   >
-                    Explore Feature
-                    <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                    <span>Launch Feature</span>
+                    <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
                   </button>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
-      {/* Final CTA Section */}
-      <section className="relative z-10 container mx-auto px-8 py-20">
-        <div className="glass relative overflow-hidden backdrop-blur-2xl bg-white/5 border border-white/20 rounded-[32px] md:rounded-[40px] p-7 md:p-16 text-center">
-          {/* Background Elements */}
-          <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
-          
-          <div className="relative z-10">
-            <h2 className="text-5xl font-bold text-white mb-6">
-              Ready to Launch Your Learning Journey?
+      {/* Privacy Guarantee Banner */}
+      <section id="privacy" className="relative z-20 max-w-5xl mx-auto px-5 sm:px-8 py-16">
+        <div className="glass-card p-8 sm:p-12 border border-stellar-cyan/30 text-center space-y-5 relative overflow-hidden shadow-cyan-glow/20">
+          <div className="w-14 h-14 rounded-2xl bg-stellar-cyan/15 border border-stellar-cyan/30 flex items-center justify-center mx-auto text-stellar-cyan">
+            <ShieldCheck className="w-7 h-7" />
+          </div>
+          <div className="space-y-2 max-w-xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              Privacy First. Always.
             </h2>
-            <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed capitalize">
-              Join thousands of cosmic learners exploring the universe of knowledge. 
-              Your educational adventure across the stars begins now.
+            <p className="text-xs sm:text-sm text-stellar-secondary leading-relaxed">
+              We believe your learning struggles and study notes belong to you. LearnAI does not require an account, has zero trackers, and never transmits your homework to the cloud.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="bg-white text-black px-8 py-4 rounded-2xl font-medium hover:bg-white/90 transition-all duration-300 hover:scale-105 flex items-center gap-3 text-lg"
-              >
-                <span>Begin Cosmic Journey</span>
-                <Rocket className="w-6 h-6" />
-              </button>
-              <button onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })} className="px-8 py-4 text-white border border-white/30 rounded-2xl hover:bg-white/5 transition-all duration-300 backdrop-blur-sm">
-                Explore Features
-              </button>
-            </div>
+          </div>
+          <div className="pt-2">
+            <button onClick={handleGuestLaunch} className={`${btnPrimary} px-8 py-3.5 text-base`}>
+              <span>Enter Cosmic Academy</span>
+              <Rocket className="w-4 h-4 ml-1.5" />
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Enhanced Footer */}
-      <footer className="relative z-10 border-t border-white/10 backdrop-blur-2xl bg-white/5">
-        <div className="container mx-auto px-8 py-16">
-          <div className="grid lg:grid-cols-5 gap-24 mb-12">
-            <div className="lg:col-span-2">
-              <div className="flex items-center gap-3 mb-6">
-                <Logo size={40} />
-                <span className="text-3xl font-bold text-white">student_matrix</span>
-              </div>
-              <p className="text-white/70 text-lg leading-relaxed max-w-md capitalize">
-                Pioneering the future of education through cosmic exploration and AI-powered learning adventures. 
-                Join us in making knowledge accessible across the universe.
-              </p>
-            </div>
-            
-            {/* Features Column */}
-            <div>
-              <h4 className="text-white font-bold text-lg mb-6">Features</h4>
-              <ul className="space-y-3">
-                {[
-                  { name: "Mission Quests", path: "/quests" },
-                  { name: "LearnHub", path: "/learnhub" },
-                  { name: "AI Mentor", path: "/mentor" },
-                  { name: "Flashcards", path: "/flashcards" }
-                ].map((feature) => (
-                  <li key={feature.name}>
-                    <a 
-                      href={feature.path} 
-                      className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-1 inline-block"
-                    >
-                      {feature.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-              
-            {/* Resources Column */}
-            <div>
-              <h4 className="text-white font-bold text-lg mb-6">Resources</h4>
-              <ul className="space-y-3">
-                {["Learning Paths", "Documentation", "Blogs", "Roadmap"].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-              
-            {/* Support Column */}
-            <div>
-              <h4 className="text-white font-bold text-lg mb-6">Support</h4>
-              <ul className="space-y-3">
-                {["Help Center", "Contact", "Privacy Policy"].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-white/70 hover:text-white transition-all duration-300 hover:translate-x-1 inline-block">
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-    
-          </div>
-          
-           <div className="border-t border-white/10 pt-8 flex flex-col lg:flex-row justify-between items-center">
-            <p className="text-white/60 text-base capitalize">
-              © {new Date().getFullYear()} student_matrix. Embark on infinite learning possibilities.
-            </p>
-            <div className="flex gap-10 mt-4 lg:mt-0">
-              {[
-                { 
-                  name: 'Email', 
-                  url: 'mailto:pranav.kh25@gmail.com' 
-                },
-                { 
-                  name: 'GitHub', 
-                  url: 'https://github.com/FrostByte-49' 
-                },
-                { 
-                  name: 'LinkedIn', 
-                  url: 'https://www.linkedin.com/in/pranav-kh' 
-                },
-                { 
-                  name: 'Discord', 
-                  url: 'https://discord.com/users/1377918872925241375' 
-                }
-              ].map((social) => (
-                <a 
-                  key={social.name}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white/60 hover:text-white transition-all duration-300 hover:scale-110 text-base"
-                >
-                  {social.name}
-                </a>
-              ))}
-            </div>
+      {/* Footer */}
+      <footer className="relative z-20 border-t border-stellar-border/60 bg-stellar-surface/80 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <Logo size={34} showWordmark />
           </div>
 
+          <p className="text-xs text-stellar-muted text-center md:text-left">
+            © {new Date().getFullYear()} LearnAI. Stellar-inspired personalized learning assistant. All rights reserved.
+          </p>
+
+          <div className="flex items-center gap-5 text-xs text-stellar-secondary">
+            <button onClick={() => navigate('/dashboard')} className="hover:text-white transition-colors">
+              Dashboard
+            </button>
+            <button onClick={() => navigate('/quests')} className="hover:text-white transition-colors">
+              Practice
+            </button>
+            <button onClick={() => navigate('/learnhub')} className="hover:text-white transition-colors">
+              Notes
+            </button>
+            <button onClick={() => navigate('/settings')} className="hover:text-white transition-colors">
+              Settings
+            </button>
+          </div>
         </div>
       </footer>
-      
     </div>
   );
 };

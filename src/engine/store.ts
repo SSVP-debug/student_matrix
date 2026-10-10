@@ -24,9 +24,29 @@ export const defaultProfile = (): Profile => ({
 });
 
 export const defaultSettings = (): Settings => ({
-  name: 'Learner', dailyGoal: 10, textScale: 1, dyslexiaFont: false, highContrast: false,
+  name: 'Zero',
+  email: 'zero@stellarlearn.space',
+  avatarUrl: '/images/avatar.jpg',
+  dailyReminders: true,
+  achievementAlerts: true,
+  streakAlerts: true,
+  missionAlerts: true,
+  dailyGoal: 10,
+  textScale: 1,
+  dyslexiaFont: false,
+  highContrast: false,
   reduceMotion: typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches,
-  liteMode: lowEnd(), speak: false, speechRate: 1, tutorLevel: 'auto', localLlmUrl: '', localLlmModel: 'llama3.2:1b',
+  liteMode: lowEnd(),
+  speak: false,
+  speechRate: 1,
+  tutorLevel: 'auto',
+  localLlmUrl: '',
+  localLlmModel: 'llama3.2:1b',
+  aiProvider: 'auto',
+  geminiApiKey: (import.meta as any).env?.VITE_GEMINI_API_KEY || '',
+  geminiModel: 'gemini-2.5-flash',
+  groqApiKey: (import.meta as any).env?.VITE_GROQ_API_KEY || '',
+  groqModel: 'llama-3.3-70b-versatile',
 });
 
 function read<T>(key: string, fallback: () => T): T {
@@ -66,11 +86,11 @@ export const updateProfile = (fn: (p: Profile) => Profile) => profileStore.set(f
 export const updateSettings = (patch: Partial<Settings>) => settingsStore.set({ ...settingsStore.get(), ...patch });
 
 export const exportAll = (): string =>
-  JSON.stringify({ app: 'student_matrix', version: 2, exportedAt: new Date().toISOString(), profile: profileStore.get(), settings: settingsStore.get() }, null, 2);
+  JSON.stringify({ app: 'learnai', version: 2, exportedAt: new Date().toISOString(), profile: profileStore.get(), settings: settingsStore.get() }, null, 2);
 
 export const importAll = (json: string): void => {
   const data = JSON.parse(json);
-  if (!['student_matrix', 'student_matrixlearn'].includes(data?.app) || !data.profile) throw new Error('Not a student_matrix backup file');
+  if (!['learnai', 'LearnAI', 'student_matrix', 'student_matrixlearn'].includes(data?.app) || !data.profile) throw new Error('Not a valid LearnAI backup file');
   profileStore.set({ ...defaultProfile(), ...data.profile });
   if (data.settings) settingsStore.set({ ...defaultSettings(), ...data.settings });
 };

@@ -20,7 +20,7 @@ export const Settings = () => {
 
   const download = () => {
     const url = URL.createObjectURL(new Blob([exportAll()], { type: 'application/json' }));
-    const a = document.createElement('a'); a.href = url; a.download = `stellarlearn-backup-${new Date().toISOString().slice(0, 10)}.json`; a.click();
+    const a = document.createElement('a'); a.href = url; a.download = `student_matrix-backup-${new Date().toISOString().slice(0, 10)}.json`; a.click();
     URL.revokeObjectURL(url);
   };
   const upload = async (f?: File) => {

@@ -40,7 +40,7 @@ export const Sidebar = () => {
   const content = (
     <>
       <div className="flex items-center justify-between mb-7">
-        <div className="flex items-center gap-3"><Logo size={40} /><span className="text-xl font-bold text-white">StellarLearn</span></div>
+        <div className="flex items-center gap-3"><Logo size={40} /><span className="text-xl font-bold text-white">student_matrix</span></div>
         {isMobile && <button aria-label="Close menu" onClick={() => setOpen(false)} className="p-2 text-white/70 hover:text-white"><X className="w-6 h-6" /></button>}
       </div>
       <nav aria-label="Main" className="flex-1 space-y-2">
@@ -77,7 +77,7 @@ export const Sidebar = () => {
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-black focus:px-4 focus:py-2 focus:rounded-xl">Skip to content</a>
       {isMobile && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-black/90 border-b border-white/10 p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3"><Logo size={32} /><span className="text-lg font-bold text-white">StellarLearn</span></div>
+          <div className="flex items-center gap-3"><Logo size={32} /><span className="text-lg font-bold text-white">student_matrix</span></div>
           <button aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} onClick={() => setOpen(!open)} className="p-2 text-white/80 hover:text-white">
             {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>

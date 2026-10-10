@@ -148,7 +148,7 @@ export const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section className="relative z-10 container mx-auto px-8 py-20">
+      <section id="features" className="relative z-10 container mx-auto px-8 py-20">
         <div className="text-center mb-20">
           <h2 className="text-5xl font-bold text-white mb-6">
             Why Choose <span className="text-white">student_matrix?</span>

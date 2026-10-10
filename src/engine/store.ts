@@ -25,7 +25,7 @@ export const defaultProfile = (): Profile => ({
 
 export const defaultSettings = (): Settings => ({
   name: 'Zero',
-  email: 'zero@stellarlearn.space',
+  email: 'zero@student_matrix.space',
   avatarUrl: '/images/avatar.jpg',
   dailyReminders: true,
   achievementAlerts: true,

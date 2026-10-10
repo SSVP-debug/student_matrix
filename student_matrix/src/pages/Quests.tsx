@@ -151,7 +151,7 @@ export const Quests = () => {
         {sel === null ? (
           <button className={btnGhost} disabled={visible !== null} onClick={() => setVisible(fiftyFifty(q))}><Lightbulb className="inline w-4 h-4 mr-1" aria-hidden />Hint: remove two wrong answers (half XP)</button>
         ) : (
-          <div role="status" className="p-4 rounded-2xl glass border border-white/10">
+          <div role="status" className="p-4 rounded-2xl glass-hover bg-white/5 border border-white/10">
             <p className="font-semibold mb-1">{sel === q.answer ? 'Correct!' : 'Not quite.'}</p>
             <p className="text-white/80">{q.explanation}</p>
             {sel !== q.answer && <p className="text-white/70 text-sm mt-2">This will come back later in a new session so you can lock it in.</p>}

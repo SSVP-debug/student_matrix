@@ -1,0 +1,137 @@
+{
+  "categories": [
+    {
+      "name": "Knowledge Galaxy",
+      "achievements": [
+        {
+          "id": 1,
+          "title": "First Steps",
+          "description": "Complete your first learning mission",
+          "icon": "Star",
+          "isUnlocked": true,
+          "rarity": "common",
+          "unlockedDate": "2 weeks ago",
+          "progress": 100
+        },
+        {
+          "id": 2,
+          "title": "Knowledge Seeker",
+          "description": "Complete 10 missions",
+          "icon": "Target",
+          "isUnlocked": true,
+          "rarity": "rare",
+          "unlockedDate": "1 week ago",
+          "progress": 100
+        },
+        {
+          "id": 3,
+          "title": "Master Explorer",
+          "description": "Complete 50 missions",
+          "icon": "Trophy",
+          "isUnlocked": false,
+          "rarity": "epic",
+          "progress": 28
+        }
+      ]
+    },
+    {
+      "name": "Math Nebula",
+      "achievements": [
+        {
+          "id": 4,
+          "title": "Algebra Ace",
+          "description": "Master all algebra topics",
+          "icon": "Brain",
+          "isUnlocked": true,
+          "rarity": "rare",
+          "unlockedDate": "3 days ago",
+          "progress": 100
+        },
+        {
+          "id": 5,
+          "title": "Calculus Champion",
+          "description": "Complete advanced calculus",
+          "icon": "Zap",
+          "isUnlocked": false,
+          "rarity": "epic",
+          "progress": 65
+        },
+        {
+          "id": 6,
+          "title": "Math Mastermind",
+          "description": "Achieve perfection in all math topics",
+          "icon": "Award",
+          "isUnlocked": false,
+          "rarity": "legendary",
+          "progress": 15
+        }
+      ]
+    },
+    {
+      "name": "Science Meteor Belt",
+      "achievements": [
+        {
+          "id": 7,
+          "title": "Physics Pioneer",
+          "description": "Complete all physics missions",
+          "icon": "Zap",
+          "isUnlocked": true,
+          "rarity": "rare",
+          "unlockedDate": "5 days ago",
+          "progress": 100
+        },
+        {
+          "id": 8,
+          "title": "Chemistry Master",
+          "description": "Master the periodic table",
+          "icon": "Star",
+          "isUnlocked": false,
+          "rarity": "epic",
+          "progress": 40
+        },
+        {
+          "id": 9,
+          "title": "Science Sage",
+          "description": "Achieve mastery in all sciences",
+          "icon": "Trophy",
+          "isUnlocked": false,
+          "rarity": "legendary",
+          "progress": 25
+        }
+      ]
+    },
+    {
+      "name": "Dedication Constellation",
+      "achievements": [
+        {
+          "id": 10,
+          "title": "Week Warrior",
+          "description": "Maintain a 7-day streak",
+          "icon": "Flame",
+          "isUnlocked": true,
+          "rarity": "common",
+          "unlockedDate": "1 week ago",
+          "progress": 100
+        },
+        {
+          "id": 11,
+          "title": "Month Master",
+          "description": "Maintain a 30-day streak",
+          "icon": "Flame",
+          "isUnlocked": false,
+          "rarity": "rare",
+          "progress": 23
+        },
+        {
+          "id": 12,
+          "title": "Eternal Flame",
+          "description": "Maintain a 100-day streak",
+          "icon": "Flame",
+          "isUnlocked": false,
+          "rarity": "legendary",
+          "progress": 12
+        }
+      ]
+    }
+  ]
+}

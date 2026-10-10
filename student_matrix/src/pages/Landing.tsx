@@ -73,9 +73,9 @@ export const Landing = () => {
                 <span>Launch Learning</span>
                 <Rocket className="w-5 h-5" />
               </button>
-              <button onClick={() => navigate("/dashboard")} className="flex items-center gap-2 px-8 py-4 text-white border border-white/20 rounded-2xl hover:bg-white/5 transition-all duration-300 backdrop-blur-sm">
+              <button onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })} className="flex items-center gap-2 px-8 py-4 text-white border border-white/20 rounded-2xl hover:bg-white/5 transition-all duration-300 backdrop-blur-sm">
                 <Play className="w-5 h-5" />
-                Watch Demo
+                Explore Features
               </button>
             </div>
 
@@ -119,12 +119,11 @@ export const Landing = () => {
 
                 {/* Central Astronaut */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <div className="relative">
-                    {/* Replace with your image */}
+                  <div className="relative w-64 h-64 rounded-full overflow-hidden border border-white/20 shadow-[0_0_80px_rgba(0,229,255,0.18)]">
                     <img 
                       src="/images/Pixie.webp" 
-                      alt="student_matrix Hero"
-                      className="w-full h-full object-cover"
+                      alt="student_matrix cosmic learning illustration"
+                      className="w-full h-full object-cover rounded-full"
                     />
                     {/* White glow effect */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-white/5 rounded-full blur-2xl" />
@@ -280,8 +279,8 @@ export const Landing = () => {
                 <span>Begin Cosmic Journey</span>
                 <Rocket className="w-6 h-6" />
               </button>
-              <button onClick={() => navigate("/dashboard")} className="px-8 py-4 text-white border border-white/30 rounded-2xl hover:bg-white/5 transition-all duration-300 backdrop-blur-sm">
-                Schedule Demo Tour
+              <button onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })} className="px-8 py-4 text-white border border-white/30 rounded-2xl hover:bg-white/5 transition-all duration-300 backdrop-blur-sm">
+                Explore Features
               </button>
             </div>
           </div>

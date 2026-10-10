@@ -32,10 +32,16 @@ export const Landing = () => {
           <Logo size={48} />
           <span className="text-2xl font-bold text-white">student_matrix</span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/dashboard')}
-            className="bg-white text-black px-6 py-2 rounded-2xl font-medium hover:bg-white/90 transition-all duration-300 hover:scale-105"
+            className="border border-white/20 bg-white/[0.03] px-5 py-2 rounded-2xl font-medium text-white/80 backdrop-blur-sm transition-all duration-300 hover:border-cyan-200/30 hover:bg-white/10 hover:text-white"
+          >
+            Dashboard
+          </button>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="cosmic-button bg-white px-6 py-2 rounded-2xl font-semibold text-black transition-all duration-300 hover:bg-cyan-50"
           >
             Start Learning
           </button>

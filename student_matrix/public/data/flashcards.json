@@ -1,0 +1,496 @@
+{
+  "subjects": [
+    {
+      "id": 1,
+      "name": "Physics",
+      "icon": "⚡",
+      "cards": [
+        {
+          "id": 1,
+          "question": "What is Newton's First Law of Motion?",
+          "answer": "An object at rest stays at rest and an object in motion stays in motion unless acted upon by an external force."
+        },
+        {
+          "id": 2,
+          "question": "Define kinetic energy",
+          "answer": "The energy an object possesses due to its motion, given by KE = ½mv²"
+        },
+        {
+          "id": 3,
+          "question": "What is the formula for force?",
+          "answer": "Force = mass × acceleration (F = ma)"
+        },
+        {
+          "id": 4,
+          "question": "What is the speed of light in vacuum?",
+          "answer": "Approximately 299,792,458 meters per second"
+        },
+        {
+          "id": 5,
+          "question": "Define gravitational force",
+          "answer": "The attractive force between two masses, given by F = G(m₁m₂)/r²"
+        },
+        {
+          "id": 6,
+          "question": "What is the principle of conservation of energy?",
+          "answer": "Energy cannot be created or destroyed, only transformed from one form to another"
+        },
+        {
+          "id": 7,
+          "question": "Define momentum",
+          "answer": "The product of an object's mass and velocity (p = mv)"
+        },
+        {
+          "id": 8,
+          "question": "What is Ohm's Law?",
+          "answer": "V = IR, where V is voltage, I is current, and R is resistance"
+        },
+        {
+          "id": 9,
+          "question": "Define acceleration",
+          "answer": "The rate of change of velocity with respect to time"
+        },
+        {
+          "id": 10,
+          "question": "What is the law of reflection?",
+          "answer": "The angle of incidence equals the angle of reflection"
+        },
+        {
+          "id": 11,
+          "question": "Define work in physics",
+          "answer": "Work = force × displacement × cosθ"
+        },
+        {
+          "id": 12,
+          "question": "What is specific heat capacity?",
+          "answer": "The amount of heat required to raise the temperature of 1kg of a substance by 1°C"
+        },
+        {
+          "id": 13,
+          "question": "Define electric current",
+          "answer": "The flow of electric charge through a conductor"
+        },
+        {
+          "id": 14,
+          "question": "What is Archimedes' principle?",
+          "answer": "The buoyant force on an object equals the weight of the fluid it displaces"
+        },
+        {
+          "id": 15,
+          "question": "Define frequency",
+          "answer": "The number of complete cycles per unit time, measured in Hertz (Hz)"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Chemistry",
+      "icon": "🧪",
+      "cards": [
+        {
+          "id": 1,
+          "question": "What is the atomic number?",
+          "answer": "The number of protons in an atom's nucleus"
+        },
+        {
+          "id": 2,
+          "question": "Define pH scale",
+          "answer": "A scale from 0-14 that measures the acidity or basicity of a solution"
+        },
+        {
+          "id": 3,
+          "question": "What is a covalent bond?",
+          "answer": "A chemical bond formed by sharing electron pairs between atoms"
+        },
+        {
+          "id": 4,
+          "question": "Define mole concept",
+          "answer": "One mole contains 6.022 × 10²³ particles (Avogadro's number)"
+        },
+        {
+          "id": 5,
+          "question": "What is the periodic law?",
+          "answer": "The properties of elements are periodic functions of their atomic numbers"
+        },
+        {
+          "id": 6,
+          "question": "Define oxidation",
+          "answer": "The loss of electrons or increase in oxidation state"
+        },
+        {
+          "id": 7,
+          "question": "What is an exothermic reaction?",
+          "answer": "A reaction that releases heat energy to the surroundings"
+        },
+        {
+          "id": 8,
+          "question": "Define catalyst",
+          "answer": "A substance that increases the rate of a chemical reaction without being consumed"
+        },
+        {
+          "id": 9,
+          "question": "What is the ideal gas law?",
+          "answer": "PV = nRT, where P is pressure, V is volume, n is moles, R is gas constant, T is temperature"
+        },
+        {
+          "id": 10,
+          "question": "Define electronegativity",
+          "answer": "The ability of an atom to attract electrons in a chemical bond"
+        },
+        {
+          "id": 11,
+          "question": "What is a redox reaction?",
+          "answer": "A reaction involving both oxidation and reduction processes"
+        },
+        {
+          "id": 12,
+          "question": "Define molarity",
+          "answer": "The number of moles of solute per liter of solution"
+        },
+        {
+          "id": 13,
+          "question": "What is Le Chatelier's principle?",
+          "answer": "A system at equilibrium responds to stress by shifting to counteract the change"
+        },
+        {
+          "id": 14,
+          "question": "Define isotopes",
+          "answer": "Atoms of the same element with different numbers of neutrons"
+        },
+        {
+          "id": 15,
+          "question": "What is the octet rule?",
+          "answer": "Atoms tend to gain, lose, or share electrons to achieve 8 valence electrons"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Mathematics",
+      "icon": "📐",
+      "cards": [
+        {
+          "id": 1,
+          "question": "What is the quadratic formula?",
+          "answer": "x = [-b ± √(b² - 4ac)] / 2a"
+        },
+        {
+          "id": 2,
+          "question": "Define derivative",
+          "answer": "The instantaneous rate of change of a function with respect to its variable"
+        },
+        {
+          "id": 3,
+          "question": "What is the Pythagorean theorem?",
+          "answer": "a² + b² = c², where c is the hypotenuse of a right triangle"
+        },
+        {
+          "id": 4,
+          "question": "Define logarithm",
+          "answer": "The exponent to which a base must be raised to produce a given number"
+        },
+        {
+          "id": 5,
+          "question": "What is the chain rule?",
+          "answer": "d/dx[f(g(x))] = f'(g(x)) × g'(x)"
+        },
+        {
+          "id": 6,
+          "question": "Define imaginary unit i",
+          "answer": "i = √(-1), the fundamental imaginary number"
+        },
+        {
+          "id": 7,
+          "question": "What is the fundamental theorem of calculus?",
+          "answer": "The derivative of an integral of a function is the original function"
+        },
+        {
+          "id": 8,
+          "question": "Define matrix",
+          "answer": "A rectangular array of numbers arranged in rows and columns"
+        },
+        {
+          "id": 9,
+          "question": "What is Euler's formula?",
+          "answer": "e^(iθ) = cosθ + i sinθ"
+        },
+        {
+          "id": 10,
+          "question": "Define probability",
+          "answer": "The measure of the likelihood that an event will occur"
+        },
+        {
+          "id": 11,
+          "question": "What is the binomial theorem?",
+          "answer": "(a + b)^n = Σ [n!/(k!(n-k)!)] × a^(n-k) × b^k"
+        },
+        {
+          "id": 12,
+          "question": "Define limit",
+          "answer": "The value that a function approaches as the input approaches some value"
+        },
+        {
+          "id": 13,
+          "question": "What is the dot product of two vectors?",
+          "answer": "A · B = |A||B|cosθ, where θ is the angle between them"
+        },
+        {
+          "id": 14,
+          "question": "Define complex number",
+          "answer": "A number of the form a + bi, where a and b are real numbers"
+        },
+        {
+          "id": 15,
+          "question": "What is the mean value theorem?",
+          "answer": "If f is continuous on [a,b] and differentiable on (a,b), then there exists c in (a,b) such that f'(c) = [f(b)-f(a)]/(b-a)"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "C++",
+      "icon": "💻",
+      "cards": [
+        {
+          "id": 1,
+          "question": "What is the difference between ++i and i++?",
+          "answer": "++i is pre-increment (increment then use), i++ is post-increment (use then increment)"
+        },
+        {
+          "id": 2,
+          "question": "Define polymorphism in C++",
+          "answer": "The ability of different objects to respond to the same message in different ways"
+        },
+        {
+          "id": 3,
+          "question": "What is a constructor?",
+          "answer": "A special member function that initializes objects of a class"
+        },
+        {
+          "id": 4,
+          "question": "Define inheritance",
+          "answer": "The mechanism of creating new classes from existing classes"
+        },
+        {
+          "id": 5,
+          "question": "What is the 'this' pointer?",
+          "answer": "A pointer that points to the current object instance"
+        },
+        {
+          "id": 6,
+          "question": "Define virtual function",
+          "answer": "A member function that can be overridden in derived classes"
+        },
+        {
+          "id": 7,
+          "question": "What is function overloading?",
+          "answer": "Defining multiple functions with the same name but different parameters"
+        },
+        {
+          "id": 8,
+          "question": "Define template in C++",
+          "answer": "A feature that allows functions and classes to operate with generic types"
+        },
+        {
+          "id": 9,
+          "question": "What is RAII?",
+          "answer": "Resource Acquisition Is Initialization - managing resources through object lifetime"
+        },
+        {
+          "id": 10,
+          "question": "Define namespace",
+          "answer": "A declarative region that provides scope to identifiers"
+        },
+        {
+          "id": 11,
+          "question": "What is a smart pointer?",
+          "answer": "A class that manages dynamic memory automatically"
+        },
+        {
+          "id": 12,
+          "question": "Define exception handling",
+          "answer": "The process of responding to exceptional circumstances during program execution"
+        },
+        {
+          "id": 13,
+          "question": "What is the STL?",
+          "answer": "Standard Template Library - a set of C++ template classes and functions"
+        },
+        {
+          "id": 14,
+          "question": "Define copy constructor",
+          "answer": "A constructor that initializes an object using another object of the same class"
+        },
+        {
+          "id": 15,
+          "question": "What is operator overloading?",
+          "answer": "Defining new implementations for operators when applied to user-defined types"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Java",
+      "icon": "☕",
+      "cards": [
+        {
+          "id": 1,
+          "question": "What is JVM?",
+          "answer": "Java Virtual Machine - executes Java bytecode"
+        },
+        {
+          "id": 2,
+          "question": "Define encapsulation",
+          "answer": "The bundling of data with methods that operate on that data"
+        },
+        {
+          "id": 3,
+          "question": "What is the difference between == and .equals()?",
+          "answer": "== compares references, .equals() compares content"
+        },
+        {
+          "id": 4,
+          "question": "Define interface",
+          "answer": "A reference type that contains only abstract methods"
+        },
+        {
+          "id": 5,
+          "question": "What is garbage collection?",
+          "answer": "Automatic memory management that reclaims memory occupied by unused objects"
+        },
+        {
+          "id": 6,
+          "question": "Define multithreading",
+          "answer": "The ability of a program to execute multiple threads concurrently"
+        },
+        {
+          "id": 7,
+          "question": "What is the final keyword?",
+          "answer": "A non-access modifier used for classes, methods, and variables to make them non-changeable"
+        },
+        {
+          "id": 8,
+          "question": "Define package",
+          "answer": "A namespace that organizes a set of related classes and interfaces"
+        },
+        {
+          "id": 9,
+          "question": "What is method overriding?",
+          "answer": "When a subclass provides a specific implementation of a method already defined in its parent class"
+        },
+        {
+          "id": 10,
+          "question": "Define exception hierarchy",
+          "answer": "Throwable → Exception (checked) and Error (unchecked) → RuntimeException"
+        },
+        {
+          "id": 11,
+          "question": "What is the static keyword?",
+          "answer": "A keyword used for memory management mainly, shared among all instances"
+        },
+        {
+          "id": 12,
+          "question": "Define collection framework",
+          "answer": "A unified architecture for representing and manipulating collections"
+        },
+        {
+          "id": 13,
+          "question": "What is JDBC?",
+          "answer": "Java Database Connectivity - API for connecting and executing queries on databases"
+        },
+        {
+          "id": 14,
+          "question": "Define abstraction",
+          "answer": "The concept of hiding implementation details and showing only essential features"
+        },
+        {
+          "id": 15,
+          "question": "What is the super keyword?",
+          "answer": "A reference variable used to refer immediate parent class object"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Python",
+      "icon": "🐍",
+      "cards": [
+        {
+          "id": 1,
+          "question": "What are Python decorators?",
+          "answer": "Functions that modify the behavior of other functions or methods"
+        },
+        {
+          "id": 2,
+          "question": "Define list comprehension",
+          "answer": "A concise way to create lists: [expression for item in iterable if condition]"
+        },
+        {
+          "id": 3,
+          "question": "What is the difference between list and tuple?",
+          "answer": "List is mutable, tuple is immutable"
+        },
+        {
+          "id": 4,
+          "question": "Define generator",
+          "answer": "A function that returns an iterator and yields values one at a time"
+        },
+        {
+          "id": 5,
+          "question": "What are *args and **kwargs?",
+          "answer": "*args for variable arguments, **kwargs for variable keyword arguments"
+        },
+        {
+          "id": 6,
+          "question": "Define context manager",
+          "answer": "An object that defines the runtime context using __enter__ and __exit__ methods"
+        },
+        {
+          "id": 7,
+          "question": "What is the GIL?",
+          "answer": "Global Interpreter Lock - allows only one thread to execute Python bytecode at a time"
+        },
+        {
+          "id": 8,
+          "question": "Define lambda function",
+          "answer": "An anonymous function defined with lambda keyword: lambda x: x*2"
+        },
+        {
+          "id": 9,
+          "question": "What is PEP 8?",
+          "answer": "Python Enhancement Proposal that provides style guidelines for Python code"
+        },
+        {
+          "id": 10,
+          "question": "Define dictionary comprehension",
+          "answer": "{key: value for key, value in iterable}"
+        },
+        {
+          "id": 11,
+          "question": "What is the difference between __str__ and __repr__?",
+          "answer": "__str__ for readable output, __repr__ for unambiguous representation"
+        },
+        {
+          "id": 12,
+          "question": "Define module",
+          "answer": "A file containing Python definitions and statements"
+        },
+        {
+          "id": 13,
+          "question": "What are Python magic methods?",
+          "answer": "Special methods with double underscores that define behavior for operators"
+        },
+        {
+          "id": 14,
+          "question": "Define iterator",
+          "answer": "An object that implements __iter__() and __next__() methods"
+        },
+        {
+          "id": 15,
+          "question": "What is the zip function?",
+          "answer": "Combines multiple iterables into tuples: zip([1,2], ['a','b']) → [(1,'a'), (2,'b')]"
+        }
+      ]
+    }
+  ]
+}

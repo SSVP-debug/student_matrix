@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 20s linear infinite;
+  }
+
+  .animate-spin-fast {
+    animation: spin-slow 8s linear infinite;
+  }
+}
+
+html {
+  --scale: 1;
+  font-size: calc(100% * var(--scale));
+}
+
+body {
+  margin: 0;
+  background: #000;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #0e0e0e;   
+}
+
+/* Thumb */
+::-webkit-scrollbar-thumb {
+  background: #3a3a3a;   
+  border-radius: 10px;
+}
+
+/* Hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #5c5c5c;   
+}
+
+/* ---------- Components ---------- */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+}
+
+:focus-visible {
+  outline: 3px solid #00e5ff;
+  outline-offset: 2px;
+}
+
+input, select, textarea { color: #fff; }
+
+/* ---------- Accessibility modes ---------- */
+[data-dyslexia] body {
+  font-family: 'OpenDyslexic', 'Atkinson Hyperlegible', 'Lexend', Verdana, 'Trebuchet MS', sans-serif;
+  letter-spacing: 0.05em;
+  word-spacing: 0.12em;
+  line-height: 1.8;
+}
+
+[data-contrast] body { background: #000; }
+[data-contrast] .glass { background: #000; border-color: #fff; backdrop-filter: none; }
+[data-contrast] [class*='text-white/'] { color: #fff !important; }
+[data-contrast] [class*='border-white/'] { border-color: rgba(255, 255, 255, 0.7) !important; }
+
+[data-reduce-motion] *, [data-reduce-motion] *::before, [data-reduce-motion] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* Lite mode: cheaper rendering for low-end GPUs and phones. */
+[data-lite] * { backdrop-filter: none !important; }
+[data-lite] .glass { background: rgba(20, 24, 48, 0.9); }
+[data-lite] [class*='blur-'] { filter: none !important; }
+[data-lite] [class*='shadow-'] { box-shadow: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

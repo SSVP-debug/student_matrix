@@ -1,80 +1,364 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Send, Volume2, Square, Loader2 } from 'lucide-react';
-import { Page, Card, btnPrimary, btnGhost } from '../components/Page';
+import {
+  Send,
+  Loader2,
+  Sparkles,
+  BookOpen,
+  Zap,
+  Atom,
+  Target,
+  FileText,
+  HelpCircle,
+  Key,
+  X,
+  Volume2,
+  Square,
+} from 'lucide-react';
+import { Sidebar } from '../components/Sidebar';
 import { Md } from '../components/Md';
-import { updateSettings, useProfile, useSettings } from '../engine/store';
+import { useProfile, useSettings, updateSettings } from '../engine/store';
 import { useStaticData } from '../engine/bank';
 import { answer, buildIndex, type TutorReply } from '../engine/tutor';
 import { speak, stopSpeaking, canSpeak } from '../engine/speech';
-import type { Settings } from '../engine/types';
 
-interface Msg { role: 'user' | 'tutor'; text: string; reply?: TutorReply }
+interface Msg {
+  role: 'user' | 'tutor';
+  text: string;
+  reply?: TutorReply;
+  time: string;
+}
 
-const SUGGESTIONS = ["What is Newton's first law?", 'Explain kinetic energy', 'What is a quadratic equation?', 'What is polymorphism?'];
+const INITIAL_MESSAGE: Msg = {
+  role: 'tutor',
+  text: "Hello! I'm Pixie, your AI Learning Assistant. I'm here to help you explore the universe of knowledge. What would you like to learn today?",
+  time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+};
 
 export const Mentor = () => {
-  const nav = useNavigate();
   const p = useProfile();
   const s = useSettings();
-  const { data, error } = useStaticData();
-  const index = useMemo(() => (data ? buildIndex(data, p) : null), [data, p.notes]); // eslint-disable-line react-hooks/exhaustive-deps
-  const [msgs, setMsgs] = useState<Msg[]>([{ role: 'tutor', text: "Hi, I'm Pixie, your on-device tutor. Ask me about anything in your course material or your own notes. I work offline, and I adjust how I explain based on how well you know the topic." }]);
+  const { data } = useStaticData();
+
+  const index = useMemo(
+    () => (data ? buildIndex(data, p) : null),
+    // eslint-disable-line react-hooks/exhaustive-deps
+    [data, p.notes]
+  );
+
+  const [msgs, setMsgs] = useState<Msg[]>([INITIAL_MESSAGE]);
   const [q, setQ] = useState('');
   const [busy, setBusy] = useState(false);
-  const end = useRef<HTMLDivElement>(null);
-  useEffect(() => { end.current?.scrollIntoView({ block: 'end' }); }, [msgs]);
+  const [showKeyModal, setShowKeyModal] = useState(false);
+  const [apiKeyInput, setApiKeyInput] = useState(s.geminiApiKey || '');
+
+  const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [msgs, busy]);
+
   useEffect(() => stopSpeaking, []);
 
   const ask = async (text: string) => {
     const query = text.trim();
-    if (!query || !index || !data || busy) return;
-    setMsgs((m) => [...m, { role: 'user', text: query }]); setQ(''); setBusy(true);
+    if (!query || busy) return;
+
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setMsgs((prev) => [...prev, { role: 'user', text: query, time }]);
+    setQ('');
+    setBusy(true);
+
     try {
-      const r = await answer(query, index, data, p, s);
-      setMsgs((m) => [...m, { role: 'tutor', text: r.markdown, reply: r }]);
-      if (s.speak) speak(r.markdown, s.speechRate);
-    } finally { setBusy(false); }
+      if (index && data) {
+        const r = await answer(query, index, data, p, s);
+        setMsgs((prev) => [
+          ...prev,
+          {
+            role: 'tutor',
+            text: r.markdown,
+            reply: r,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          },
+        ]);
+        if (s.speak) speak(r.markdown, s.speechRate);
+      }
+    } catch (e) {
+      setMsgs((prev) => [
+        ...prev,
+        {
+          role: 'tutor',
+          text: `I ran into an issue processing your request: ${(e as Error).message}`,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
+    } finally {
+      setBusy(false);
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
   };
 
-  if (error) return <Page title="Tutor"><Card>Could not load course data: {error}</Card></Page>;
+  const handleSaveKey = () => {
+    updateSettings({ geminiApiKey: apiKeyInput.trim(), aiProvider: 'gemini' });
+    setShowKeyModal(false);
+  };
 
   return (
-    <Page title="Tutor" subtitle="Answers come from material stored on your device, explained at your level.">
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <label htmlFor="lvl" className="text-sm text-white/70">Explanation level</label>
-        <select id="lvl" value={s.tutorLevel} onChange={(e) => updateSettings({ tutorLevel: e.target.value as Settings['tutorLevel'] })} className="rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-2">
-          <option value="auto">Auto (matches my mastery)</option><option value="simple">Simple</option><option value="standard">Standard</option><option value="deep">Deep</option>
-        </select>
-      </div>
-      <Card className="max-w-3xl flex flex-col" >
-        <div className="space-y-4 max-h-[55vh] overflow-y-auto pr-1" aria-live="polite">
-          {msgs.map((m, i) => (
-            <div key={i} className={m.role === 'user' ? 'text-right' : ''}>
-              <div className={`inline-block max-w-full text-left rounded-2xl p-4 ${m.role === 'user' ? 'bg-white text-black' : 'glass border border-white/10'}`}>
-                {m.role === 'user' ? m.text : <Md text={m.text} />}
-                {m.reply && (
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {canSpeak() && <button className={btnGhost} aria-label="Read aloud" onClick={() => speak(m.text, s.speechRate)}><Volume2 className="w-4 h-4" /></button>}
-                    {m.reply.practice && <button className={btnGhost} onClick={() => nav(`/quests?topic=${encodeURIComponent(m.reply!.practice!.topic)}`)}>Practise this topic</button>}
+    <div className="flex min-h-screen bg-[#000000] text-white">
+      <Sidebar />
+
+      <main id="main" tabIndex={-1} className="flex-1 p-4 md:p-6 lg:p-8 pt-20 md:pt-6 flex flex-col max-w-[1600px] mx-auto w-full">
+        <div className="grid lg:grid-cols-12 gap-6 flex-1 items-start">
+          {/* Left Column: Chat Conversation Container */}
+          <div className="lg:col-span-8 xl:col-span-8 flex flex-col h-[calc(100vh-3.5rem)] bg-[#0c0d12] border border-[#171a24] rounded-3xl p-5 md:p-6 shadow-2xl relative">
+            {/* Messages Scroll Area */}
+            <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+              {msgs.map((m, i) => {
+                const isUser = m.role === 'user';
+                return (
+                  <div key={i} className={`flex ${isUser ? 'justify-end' : 'justify-start'} animate-fade-in`}>
+                    <div
+                      className={`max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed ${
+                        isUser
+                          ? 'bg-[#1e2230] text-white rounded-tr-none'
+                          : 'bg-[#181a22] text-[#f1f5f9] rounded-tl-none border border-[#222636]'
+                      }`}
+                    >
+                      {isUser ? (
+                        <p className="whitespace-pre-wrap">{m.text}</p>
+                      ) : (
+                        <div>
+                          <Md text={m.text} />
+                          {canSpeak() && (
+                            <button
+                              type="button"
+                              onClick={() => speak(m.text, s.speechRate)}
+                              className="mt-3 text-xs text-[#94a3b8] hover:text-white flex items-center gap-1.5 pt-2 border-t border-white/5"
+                            >
+                              <Volume2 className="w-3.5 h-3.5" />
+                              <span>Listen</span>
+                            </button>
+                          )}
+                        </div>
+                      )}
+                      <span className="block text-[11px] text-[#64748b] mt-2 text-right">{m.time}</span>
+                    </div>
                   </div>
+                );
+              })}
+
+              {busy && (
+                <div className="flex justify-start">
+                  <div className="bg-[#181a22] border border-[#222636] rounded-2xl rounded-tl-none p-4 text-sm text-[#94a3b8] flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+                    <span>Pixie is thinking…</span>
+                  </div>
+                </div>
+              )}
+
+              <div ref={endRef} />
+            </div>
+
+            {/* Quick Suggestion Pills (Screenshot 5: 2x2 grid) */}
+            <div className="pt-4 border-t border-[#1a1d28] space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {[
+                  { icon: BookOpen, text: 'Explain quantum physics basics' },
+                  { icon: Zap, text: 'Help with math problem' },
+                  { icon: Atom, text: 'Create study plan' },
+                  { icon: Target, text: 'Quiz me on biology' },
+                ].map((item, idx) => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => ask(item.text)}
+                      className="bg-[#14161f] border border-[#212534] hover:bg-[#1a1d29] hover:border-[#2f354a] text-[#cbd5e1] text-xs py-3 px-4 rounded-xl flex items-center gap-3 transition-colors text-left font-medium"
+                    >
+                      <Icon className="w-4 h-4 text-[#94a3b8] shrink-0" />
+                      <span className="truncate">{item.text}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Message Composer (Screenshot 5) */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  ask(q);
+                }}
+                className="flex items-center gap-3 bg-[#13151c] border border-[#232736] rounded-2xl px-4 py-2.5 shadow-inner"
+              >
+                <input
+                  ref={inputRef}
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  disabled={busy}
+                  placeholder="Ask me anything about learning..."
+                  className="flex-1 bg-transparent text-sm text-white placeholder-[#64748b] focus:outline-none"
+                />
+
+                {canSpeak() && (
+                  <button
+                    type="button"
+                    onClick={stopSpeaking}
+                    className="p-1.5 text-[#64748b] hover:text-white"
+                    title="Stop reading"
+                  >
+                    <Square className="w-4 h-4" />
+                  </button>
                 )}
+
+                <button
+                  type="submit"
+                  disabled={busy || !q.trim()}
+                  className="w-9 h-9 rounded-xl bg-[#202534] hover:bg-white hover:text-black text-white flex items-center justify-center transition-all disabled:opacity-30 disabled:hover:bg-[#202534] disabled:hover:text-white"
+                  aria-label="Send message"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </form>
+            </div>
+          </div>
+
+          {/* Right Column: AI Assistant Profile & Capabilities Cards (Screenshot 5) */}
+          <div className="lg:col-span-4 xl:col-span-4 space-y-4">
+            {/* Card 1: Pixie Avatar & Status */}
+            <div className="bg-[#0c0d12] border border-[#171a24] rounded-2xl p-6 text-center space-y-3 shadow-xl">
+              <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden border border-white/10 shadow-lg">
+                <img
+                  src="/images/Pixie.webp"
+                  alt="Pixie"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white tracking-tight">Pixie</h3>
+                <p className="text-xs text-[#94a3b8] mt-0.5">Your AI Learning Assistant</p>
+              </div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#141722] border border-[#222736] text-xs text-[#cbd5e1]">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Online & Ready</span>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  onClick={() => setShowKeyModal(true)}
+                  className="text-[11px] text-[#38bdf8] hover:underline flex items-center justify-center gap-1 mx-auto"
+                >
+                  <Key className="w-3 h-3" />
+                  <span>Configure Gemini Key</span>
+                </button>
               </div>
             </div>
-          ))}
-          {busy && <p className="text-white/70 text-sm"><Loader2 className="inline w-4 h-4 animate-spin mr-1" aria-hidden />Thinking…</p>}
-          <div ref={end} />
+
+            {/* Card 2: Learning Capabilities */}
+            <div className="bg-[#0c0d12] border border-[#171a24] rounded-2xl p-5 space-y-4 shadow-xl">
+              <h4 className="text-sm font-bold text-white tracking-tight">Learning Capabilities</h4>
+
+              <div className="space-y-3.5">
+                {[
+                  {
+                    icon: Sparkles,
+                    title: 'Explain Concepts',
+                    desc: 'Break down complex topics clearly',
+                  },
+                  {
+                    icon: FileText,
+                    title: 'Study Resources',
+                    desc: 'Create notes & learning materials',
+                  },
+                  {
+                    icon: Target,
+                    title: 'Practice & Quizzes',
+                    desc: 'Generate exercises and tests',
+                  },
+                  {
+                    icon: HelpCircle,
+                    title: 'Personalized Help',
+                    desc: 'Adapts to your learning needs',
+                  },
+                ].map((cap, idx) => {
+                  const Icon = cap.icon;
+                  return (
+                    <div key={idx} className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-[#151822] border border-[#222736] flex items-center justify-center text-[#94a3b8] shrink-0 mt-0.5">
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-white leading-tight">{cap.title}</p>
+                        <p className="text-[11px] text-[#94a3b8] leading-tight mt-0.5">{cap.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Card 3: Pro Tips */}
+            <div className="bg-[#0c0d12] border border-[#171a24] rounded-2xl p-5 space-y-3 shadow-xl">
+              <h4 className="text-sm font-bold text-white tracking-tight">Pro Tips</h4>
+              <ul className="space-y-2 text-xs text-[#94a3b8]">
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#64748b]" />
+                  <span>Be specific with your questions</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#64748b]" />
+                  <span>Ask for examples when confused</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#64748b]" />
+                  <span>Request practice problems</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#64748b]" />
+                  <span>Ask for different explanations</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2 mt-4">
-          {SUGGESTIONS.map((x) => <button key={x} className={`${btnGhost} text-sm`} onClick={() => ask(x)}>{x}</button>)}
+      </main>
+
+      {/* API Key Modal */}
+      {showKeyModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0e1017] border border-[#202534] max-w-md w-full p-6 rounded-2xl space-y-4 shadow-2xl">
+            <div className="flex justify-between items-center pb-2 border-b border-[#202534]">
+              <h3 className="font-bold text-white text-base">Gemini API Key</h3>
+              <button onClick={() => setShowKeyModal(false)} className="text-[#64748b] hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-xs text-[#94a3b8]">
+              Your key is saved locally in browser storage for open-ended queries.
+            </p>
+            <input
+              type="password"
+              placeholder="AQ... or AIzaSy..."
+              value={apiKeyInput}
+              onChange={(e) => setApiKeyInput(e.target.value)}
+              className="w-full bg-[#151822] border border-[#262c3e] rounded-xl p-3 text-xs text-white placeholder-[#64748b] focus:outline-none focus:border-cyan-400"
+            />
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setShowKeyModal(false)}
+                className="px-4 py-2 text-xs text-[#94a3b8] hover:text-white"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveKey}
+                className="px-5 py-2 rounded-xl bg-white text-black font-semibold text-xs hover:bg-slate-100"
+              >
+                Save Key
+              </button>
+            </div>
+          </div>
         </div>
-        <form className="flex gap-2 mt-3" onSubmit={(e) => { e.preventDefault(); ask(q); }}>
-          <label htmlFor="q" className="sr-only">Your question</label>
-          <input id="q" value={q} onChange={(e) => setQ(e.target.value)} disabled={!index} placeholder={index ? 'Ask a question…' : 'Loading course material…'} className="flex-1 rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-3" />
-          <button type="submit" className={btnPrimary} disabled={busy || !q.trim()} aria-label="Send"><Send className="w-4 h-4" /></button>
-          <button type="button" className={btnGhost} aria-label="Stop reading" onClick={stopSpeaking}><Square className="w-4 h-4" /></button>
-        </form>
-      </Card>
-    </Page>
+      )}
+    </div>
   );
 };

@@ -79,6 +79,12 @@ export interface Profile {
 
 export interface Settings {
   name: string;
+  email?: string;
+  avatarUrl?: string;
+  dailyReminders?: boolean;
+  achievementAlerts?: boolean;
+  streakAlerts?: boolean;
+  missionAlerts?: boolean;
   dailyGoal: number;
   textScale: number; // 0.9 .. 1.5
   dyslexiaFont: boolean;
@@ -90,6 +96,11 @@ export interface Settings {
   tutorLevel: 'auto' | 'simple' | 'standard' | 'deep';
   localLlmUrl: string;
   localLlmModel: string;
+  aiProvider?: 'auto' | 'gemini' | 'groq' | 'local';
+  geminiApiKey?: string;
+  geminiModel?: string;
+  groqApiKey?: string;
+  groqModel?: string;
 }
 
 export interface Recommendation {

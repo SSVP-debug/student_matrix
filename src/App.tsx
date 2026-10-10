@@ -2,6 +2,8 @@ import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Landing } from './pages/Landing';
 import { useSettings } from './engine/store';
+import { Loader2 } from 'lucide-react';
+import { Logo } from './components/Logo';
 
 const lazyPage = <K extends string>(loader: () => Promise<Record<K, React.ComponentType>>, name: K) =>
   lazy(async () => ({ default: (await loader())[name] }));
@@ -26,14 +28,31 @@ function useApplySettings() {
   }, [s]);
 }
 
+const LoadingFallback = () => (
+  <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-stellar-bg space-y-4" role="status">
+    <div className="relative">
+      <Logo size={56} />
+      <div className="absolute -inset-2 rounded-full border border-stellar-cyan/30 animate-spin-slow pointer-events-none" />
+    </div>
+    <div className="space-y-1">
+      <p className="text-sm font-semibold text-white tracking-wide flex items-center justify-center gap-2">
+        <Loader2 className="w-4 h-4 animate-spin text-stellar-cyan" />
+        <span>Initializing LearnAI…</span>
+      </p>
+      <p className="text-xs text-stellar-secondary">Loading on-device learning matrix</p>
+    </div>
+  </div>
+);
+
 function App() {
   useApplySettings();
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-black via-[#0A0F2D] to-black">
-        <Suspense fallback={<p className="p-8 text-white/70" role="status">Loading…</p>}>
+      <div className="min-h-screen bg-stellar-bg text-stellar-text selection:bg-stellar-violet/30 selection:text-white">
+        <Suspense fallback={<LoadingFallback />}>
           <Routes>
             <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Landing />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/quests" element={<Quests />} />
             <Route path="/learnhub" element={<LearnHub />} />

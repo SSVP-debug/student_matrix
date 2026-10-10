@@ -6,7 +6,7 @@ export const Landing = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black">
+    <div className="relative min-h-screen overflow-hidden bg-black text-white">
       {/* Animated Star Background */}
       <div className="absolute inset-0">
         {[...Array(100)].map((_, i) => (
@@ -27,7 +27,7 @@ export const Landing = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="relative z-20 flex items-center justify-between px-8 py-6">
+      <nav className="relative z-20 flex items-center justify-between px-5 md:px-8 py-5 md:py-6 max-w-7xl mx-auto">
         <div className="flex items-center gap-3">
           <Logo size={48} />
           <span className="text-2xl font-bold text-white">student_matrix</span>
@@ -43,7 +43,7 @@ export const Landing = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 container mx-auto px-8 pt-8 pb-32">
+      <section className="relative z-10 container mx-auto px-5 md:px-8 pt-8 pb-24 md:pb-32">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-8">
             <div className="inline-block">
@@ -53,9 +53,9 @@ export const Landing = () => {
               </div>
             </div>
 
-            <h1 className="text-6xl lg:text-7xl font-bold text-white leading-tight">
+            <h1 className="cosmic-heading text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.04]">
               Learn Across{' '}
-              <span className="bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+              <span className="cosmic-gradient-text">
                 The Universe
               </span>
             </h1>
@@ -68,12 +68,12 @@ export const Landing = () => {
             <div className="flex flex-wrap gap-4">
               <button
                 onClick={() => navigate('/dashboard')}
-                className="bg-white text-black px-8 py-4 rounded-2xl font-medium hover:bg-white/90 transition-all duration-300 hover:scale-105 flex items-center gap-2"
+                className="cosmic-button bg-white text-black px-8 py-4 rounded-2xl font-semibold hover:bg-cyan-50 transition-all duration-300 hover:scale-[1.02] flex items-center gap-2"
               >
                 <span>Launch Learning</span>
                 <Rocket className="w-5 h-5" />
               </button>
-              <button className="flex items-center gap-2 px-8 py-4 text-white border border-white/30 rounded-2xl hover:bg-white/5 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+              <button onClick={() => navigate("/dashboard")} className="flex items-center gap-2 px-8 py-4 text-white border border-white/20 rounded-2xl hover:bg-white/5 transition-all duration-300 backdrop-blur-sm">
                 <Play className="w-5 h-5" />
                 Watch Demo
               </button>
@@ -180,7 +180,7 @@ export const Landing = () => {
           ].map((feature, index) => (
             <div key={index} className="group relative">
               <div className="absolute inset-0 bg-white/5 rounded-[32px] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-[32px] p-8 hover:bg-white/10 transition-all duration-500 group-hover:scale-105 h-full">
+              <div className="glass glass-hover relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-[32px] p-8 transition-all duration-300 h-full">
                 <div className="w-20 h-20 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-2xl">
                   <feature.icon className="w-10 h-10 text-white" />
                 </div>
@@ -234,7 +234,7 @@ export const Landing = () => {
           ].map((feature, index) => (
             <div key={index} className="group relative">
               <div className="absolute inset-0 bg-white/5 rounded-[28px] blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative backdrop-blur-lg bg-white/5 border border-white/10 rounded-[28px] p-8 hover:bg-white/10 transition-all duration-500 group-hover:scale-105 h-full flex flex-col">
+              <div className="glass glass-hover relative backdrop-blur-lg bg-white/5 border border-white/10 rounded-[28px] p-8 transition-all duration-300 h-full flex flex-col">
                 <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                   <feature.icon className="w-8 h-8 text-white" />
                 </div>
@@ -259,7 +259,7 @@ export const Landing = () => {
 
       {/* Final CTA Section */}
       <section className="relative z-10 container mx-auto px-8 py-20">
-        <div className="relative overflow-hidden backdrop-blur-2xl bg-white/5 border border-white/20 rounded-[40px] p-16 text-center">
+        <div className="glass relative overflow-hidden backdrop-blur-2xl bg-white/5 border border-white/20 rounded-[32px] md:rounded-[40px] p-7 md:p-16 text-center">
           {/* Background Elements */}
           <div className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
@@ -280,7 +280,7 @@ export const Landing = () => {
                 <span>Begin Cosmic Journey</span>
                 <Rocket className="w-6 h-6" />
               </button>
-              <button className="px-8 py-4 text-white border border-white/30 rounded-2xl hover:bg-white/5 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+              <button onClick={() => navigate("/dashboard")} className="px-8 py-4 text-white border border-white/30 rounded-2xl hover:bg-white/5 transition-all duration-300 backdrop-blur-sm">
                 Schedule Demo Tour
               </button>
             </div>

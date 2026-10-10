@@ -33,7 +33,7 @@ export const Settings = () => {
   return (
     <Page title="Settings" subtitle="Accessibility, performance and privacy controls.">
       <div className="grid lg:grid-cols-2 gap-4">
-        <Card>
+        <Card className="glass-hover glass-hover">
           <h2 className="text-xl font-semibold tracking-tight mb-3">Profile & goals</h2>
           <label htmlFor="name" className="block text-sm text-white/70 mb-1">Your name</label>
           <input id="name" value={s.name} maxLength={30} onChange={(e) => updateSettings({ name: e.target.value })} className="w-full rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-3 mb-4" />
@@ -41,7 +41,7 @@ export const Settings = () => {
           <input id="goal" type="range" min={3} max={40} value={s.dailyGoal} onChange={(e) => updateSettings({ dailyGoal: Number(e.target.value) })} className="w-full accent-cyan-300" />
         </Card>
 
-        <Card>
+        <Card className="glass-hover glass-hover">
           <h2 className="text-xl font-semibold tracking-tight mb-1">Accessibility</h2>
           <label htmlFor="scale" className="block text-sm text-white/70 mt-2 mb-1">Text size: {Math.round(s.textScale * 100)}%</label>
           <input id="scale" type="range" min={0.9} max={1.5} step={0.05} value={s.textScale} onChange={(e) => updateSettings({ textScale: Number(e.target.value) })} className="w-full accent-cyan-300 mb-2" />
@@ -54,13 +54,13 @@ export const Settings = () => {
             <button className={`${btnGhost} mt-2`} onClick={() => speak('This is how I will sound.', s.speechRate)}>Test voice</button></div>}
         </Card>
 
-        <Card>
+        <Card className="glass-hover glass-hover">
           <h2 className="text-xl font-semibold tracking-tight mb-1">Performance</h2>
           <Toggle label="Lite mode (low-resource devices)" hint="Turns off blur effects, animations and decorative graphics to save battery and memory. Enabled automatically on low-memory devices." checked={s.liteMode} onChange={(v) => updateSettings({ liteMode: v })} />
           <p className="text-sm text-white/70 mt-3">The app works fully offline after the first load and uses about {kb} KB of local storage for your progress.</p>
         </Card>
 
-        <Card>
+        <Card className="glass-hover glass-hover">
           <h2 className="text-xl font-semibold tracking-tight mb-1">Optional local AI model</h2>
           <p className="text-sm text-white/70 mb-3">The tutor already works without any model. If you run an Ollama server on this computer or your home network, the tutor can use it for fuller answers. Only localhost / private-network addresses are accepted, so your questions never go to the internet.</p>
           <label htmlFor="llm" className="block text-sm text-white/70 mb-1">Server address</label>
@@ -70,7 +70,7 @@ export const Settings = () => {
           <input id="model" value={s.localLlmModel} onChange={(e) => updateSettings({ localLlmModel: e.target.value.trim() })} className="w-full rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-3" />
         </Card>
 
-        <Card className="lg:col-span-2">
+        <Card className="glass-hover lg:col-span-2">
           <h2 className="text-xl font-semibold tracking-tight mb-1">Your data</h2>
           <p className="text-sm text-white/70 mb-4">All progress, notes and settings are stored only in this browser. There is no account and no server. Export a backup to move to another device.</p>
           <div className="flex flex-wrap gap-3">

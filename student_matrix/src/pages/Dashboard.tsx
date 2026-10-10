@@ -50,7 +50,7 @@ export const Dashboard = () => {
           {!view ? <p className="text-white/70">Loading…</p> : (
             <ul className="space-y-3">
               {view.recs.map((r) => (
-                <li key={r.title} className="flex items-center justify-between gap-3 p-3 rounded-2xl glass border border-white/10">
+                <li key={r.title} className="flex items-center justify-between gap-3 p-3 rounded-2xl glass-hover bg-white/5 border border-white/10">
                   <div className="min-w-0"><p className="font-medium">{r.title}</p><p className="text-white/70 text-sm">{r.reason}</p></div>
                   <button className={btnPrimary} onClick={() => nav(r.path)} aria-label={`Go: ${r.title}`}><ArrowRight className="w-4 h-4" /></button>
                 </li>

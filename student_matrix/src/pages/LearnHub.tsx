@@ -41,9 +41,9 @@ export const LearnHub = () => {
       <div className="grid lg:grid-cols-2 gap-4">
         <Card className="space-y-3">
           <label htmlFor="title" className="block text-sm text-white/70">Title</label>
-          <input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Photosynthesis chapter" className="w-full rounded-2xl bg-black border border-white/20 p-3" />
+          <input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Photosynthesis chapter" className="w-full rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-3" />
           <label htmlFor="text" className="block text-sm text-white/70">Paste text</label>
-          <textarea id="text" value={text} onChange={(e) => setText(e.target.value)} rows={9} placeholder="Paste your notes or textbook passage here…" className="w-full rounded-2xl bg-black border border-white/20 p-3" />
+          <textarea id="text" value={text} onChange={(e) => setText(e.target.value)} rows={9} placeholder="Paste your notes or textbook passage here…" className="w-full rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-3" />
           <div className="flex flex-wrap gap-3">
             <button className={btnPrimary} disabled={busy || !text.trim()} onClick={() => add(text, title)}>Create study material</button>
             <input ref={file} type="file" accept=".pdf,.txt,.md,text/plain,application/pdf" className="hidden" id="upload" onChange={(e) => onFile(e.target.files?.[0])} />

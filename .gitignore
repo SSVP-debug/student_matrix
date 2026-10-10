@@ -1,35 +1,22 @@
-# ============================================
-# 📦 Node & Dependency Files
-# ============================================
+# Dependencies and package manager lockfiles
 node_modules/
-package-lock.json
+# Commit package-lock.json for reproducible Vercel/npm installs.
 yarn.lock
 pnpm-lock.yaml
 
-
-# ============================================
-# 🏗️ Build Output
-# ============================================
+# Build output
 dist/
 dist-ssr/
 build/
 out/
 
-
-# ============================================
-# ⚙️ Environment & Local Config
-# ============================================
+# Environment and local config
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
 *.local
 
-
-# ============================================
-# 🧠 IDE & Editor Settings
-# ============================================
+# IDE/editor
 .vscode/*
 !.vscode/extensions.json
 .idea/
@@ -39,56 +26,25 @@ out/
 *.sln
 *.sw?
 
-
-# ============================================
-# 🧹 System Files
-# ============================================
+# OS
 .DS_Store
 Thumbs.db
 
-
-# ============================================
-# 🪵 Logs & Debug Files
-# ============================================
+# Logs
 logs/
 *.log
 npm-debug.log*
-yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-
-# ============================================
-# 🧪 Testing / Coverage
-# ============================================
+# Testing / coverage
 coverage/
 *.lcov
 
-
-# ============================================
-# 🧰 Vite / Cache Files
-# ============================================
+# Build-tool caches
 .vite/
 vite.config.ts.timestamp-*
 vite.config.js.timestamp-*
 .cache/
 .temp/
 *.tsbuildinfo
-
-
-# ============================================
-# 🧑‍🎨 Tailwind / PostCSS / Build Tools
-# ============================================
-.postcssrc
-.tailwind.config.js.timestamp-*
-
-
-# ============================================
-# 📸 Misc 
-# ============================================
-*.pem
-*.crt
-*.key
-*.pid
-*.seed

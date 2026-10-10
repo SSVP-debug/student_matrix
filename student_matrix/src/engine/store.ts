@@ -27,6 +27,8 @@ export const defaultSettings = (): Settings => ({
   name: 'Learner', dailyGoal: 10, textScale: 1, dyslexiaFont: false, highContrast: false,
   reduceMotion: typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches,
   liteMode: lowEnd(), speak: false, speechRate: 1, tutorLevel: 'auto', localLlmUrl: '', localLlmModel: 'llama3.2:1b',
+  aiMode: 'offline', onlineProvider: 'gemini',
+  aiMode: 'offline', onlineProvider: 'gemini',
 });
 
 function read<T>(key: string, fallback: () => T): T {

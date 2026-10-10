@@ -90,6 +90,8 @@ export interface Settings {
   tutorLevel: 'auto' | 'simple' | 'standard' | 'deep';
   localLlmUrl: string;
   localLlmModel: string;
+  aiMode: 'offline' | 'online';
+  onlineProvider: 'openai' | 'gemini';
 }
 
 export interface Recommendation {

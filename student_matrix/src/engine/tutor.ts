@@ -76,8 +76,40 @@ export async function llmAnswer(query: string, grounding: string, level: Level, 
   return j.message.content;
 }
 
+export async function geminiAnswer(query: string, grounding: string, level: Level): Promise<string> {
+  let res: Response;
+  try {
+    res = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(60_000),
+      body: JSON.stringify({ query, grounding, level }),
+    });
+  } catch {
+    throw new Error('Could not connect to the local Gemini server. Restart the app with npm run dev from the student_matrix folder.');
+  }
+
+  const body = await res.text();
+  let result: { text?: string; error?: string };
+  try {
+    result = JSON.parse(body) as { text?: string; error?: string };
+  } catch {
+    throw new Error(`Gemini server returned an invalid response (HTTP ${res.status}). Restart the app with npm run dev from the student_matrix folder.`);
+  }
+  if (!res.ok) throw new Error(result.error || `Gemini service responded ${res.status}`);
+  if (!result.text) throw new Error('Gemini returned an empty reply.');
+  return result.text;
+}
+
 export async function answer(query: string, index: Index, data: StaticData, p: Profile, s: Settings): Promise<TutorReply> {
   const base = localAnswer(query, index, data, p, s);
+  if (s.geminiEnabled) {
+    const hits = index.search(query, 4);
+    const ctx = hits.map((h) => `${h.doc.title}: ${h.doc.text}`).join('\n');
+    const level = chooseLevel(s, p, base.topic);
+    const text = await geminiAnswer(query, ctx, level);
+    return { ...base, markdown: `${text}\n\n_Generated with Gemini. Your question and relevant course or note excerpts were sent to Google._`, usedLlm: true };
+  }
   if (!s.localLlmUrl) return base;
   try {
     const hits = index.search(query, 4);

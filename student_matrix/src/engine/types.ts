@@ -88,6 +88,7 @@ export interface Settings {
   speak: boolean;
   speechRate: number;
   tutorLevel: 'auto' | 'simple' | 'standard' | 'deep';
+  geminiEnabled: boolean;
   localLlmUrl: string;
   localLlmModel: string;
 }

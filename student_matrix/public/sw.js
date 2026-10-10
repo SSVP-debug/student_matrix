@@ -1,7 +1,6 @@
 /* student_matrix service worker: makes the app work with no connection.
-   - Same-origin GET requests only (nothing is ever sent to third parties).
-   - App shell + data are cached on first visit; later visits use the cache first and refresh it quietly. */
-const CACHE = 'student_matrix-v2';
+   - App shell + learning data are cached on first visit and refreshed quietly. */
+const CACHE = 'student_matrix-v3';
 const PRECACHE = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg', '/data/quests.json', '/data/flashcards.json'];
 
 self.addEventListener('install', (e) => {
@@ -16,6 +15,7 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   const url = new URL(req.url);
   if (req.method !== 'GET' || url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith('/api/')) return;
 
   // Page navigations: network first, fall back to the cached shell (single-page app).
   if (req.mode === 'navigate') {

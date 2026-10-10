@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Download, Upload, Trash2 } from 'lucide-react';
 import { Page, Card, btnPrimary, btnGhost } from '../components/Page';
 import { exportAll, importAll, resetAll, storageBytes, updateSettings, useSettings } from '../engine/store';
@@ -16,7 +16,46 @@ export const Settings = () => {
   const s = useSettings();
   const fileRef = useRef<HTMLInputElement>(null);
   const [msg, setMsg] = useState('');
+  const [geminiStatus, setGeminiStatus] = useState<'checking' | 'configured' | 'missing' | 'unavailable'>('checking');
+  const [geminiKey, setGeminiKey] = useState('');
+  const [savingGeminiKey, setSavingGeminiKey] = useState(false);
+  const [geminiMessage, setGeminiMessage] = useState('');
   const kb = (storageBytes() / 1024).toFixed(1);
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/gemini/status')
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`Server responded ${res.status}`);
+        return res.json() as Promise<{ configured: boolean }>;
+      })
+      .then(({ configured }) => { if (active) setGeminiStatus(configured ? 'configured' : 'missing'); })
+      .catch(() => { if (active) setGeminiStatus('unavailable'); });
+    return () => { active = false; };
+  }, []);
+
+  const saveGeminiKey = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!geminiKey.trim() || savingGeminiKey) return;
+    setSavingGeminiKey(true);
+    setGeminiMessage('');
+    try {
+      const response = await fetch('/api/gemini/configure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: geminiKey.trim() }),
+      });
+      const result = await response.json() as { configured?: boolean; error?: string };
+      if (!response.ok) throw new Error(result.error || `Server responded ${response.status}`);
+      setGeminiStatus('configured');
+      setGeminiKey('');
+      setGeminiMessage('Gemini key saved locally. You can now enable Gemini tutor answers.');
+    } catch (error) {
+      setGeminiMessage(error instanceof Error ? error.message : 'Could not save the Gemini key.');
+    } finally {
+      setSavingGeminiKey(false);
+    }
+  };
 
   const download = () => {
     const url = URL.createObjectURL(new Blob([exportAll()], { type: 'application/json' }));
@@ -58,6 +97,39 @@ export const Settings = () => {
           <h2 className="text-xl font-semibold tracking-tight mb-1">Performance</h2>
           <Toggle label="Lite mode (low-resource devices)" hint="Turns off blur effects, animations and decorative graphics to save battery and memory. Enabled automatically on low-memory devices." checked={s.liteMode} onChange={(v) => updateSettings({ liteMode: v })} />
           <p className="text-sm text-white/70 mt-3">The app works fully offline after the first load and uses about {kb} KB of local storage for your progress.</p>
+        </Card>
+
+        <Card className="glass-hover glass-hover">
+          <h2 className="text-xl font-semibold tracking-tight mb-1">Gemini AI tutor</h2>
+          <p className="text-sm text-white/70 mb-3">The API key stays on the local server, not in the browser. When enabled, your questions and relevant course or note excerpts are sent to Google Gemini. Do not enable this for private notes you do not want to share.</p>
+          <p className="text-sm mb-3" role="status">
+            {geminiStatus === 'checking' ? 'Checking local Gemini server…'
+              : geminiStatus === 'configured' ? 'Gemini API key is configured on the local server.'
+                : geminiStatus === 'missing' ? 'No Gemini API key found yet. Paste your key below to connect the tutor.'
+                  : 'Gemini server is not running. Start the app with npm run dev from the student_matrix folder.'}
+          </p>
+          <form className="space-y-2" onSubmit={saveGeminiKey}>
+            <label htmlFor="gemini-key" className="block text-sm text-white/70">Gemini API key</label>
+            <div className="flex flex-wrap gap-2">
+              <input
+                id="gemini-key"
+                type="password"
+                autoComplete="off"
+                spellCheck={false}
+                value={geminiKey}
+                onChange={(event) => setGeminiKey(event.target.value)}
+                placeholder={geminiStatus === 'configured' ? 'Key is saved on this device' : 'Paste your Gemini API key'}
+                className="min-w-0 flex-1 rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-3"
+                aria-describedby="gemini-key-help"
+              />
+              <button className={btnPrimary} disabled={savingGeminiKey || !geminiKey.trim()}>
+                {savingGeminiKey ? 'Saving…' : 'Save key'}
+              </button>
+            </div>
+            <p id="gemini-key-help" className="text-xs text-white/60">Saved only to this computer’s ignored .env file; never stored in browser settings or shown back here.</p>
+            {geminiMessage && <p className="text-sm" role="status">{geminiMessage}</p>}
+          </form>
+          <Toggle label="Use Gemini for tutor answers" hint="Uses Gemini instead of the on-device answer or configured local model." checked={s.geminiEnabled} onChange={(v) => updateSettings({ geminiEnabled: v })} />
         </Card>
 
         <Card className="glass-hover glass-hover">

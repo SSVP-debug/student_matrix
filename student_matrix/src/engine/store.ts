@@ -26,7 +26,7 @@ export const defaultProfile = (): Profile => ({
 export const defaultSettings = (): Settings => ({
   name: 'Learner', dailyGoal: 10, textScale: 1, dyslexiaFont: false, highContrast: false,
   reduceMotion: typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches,
-  liteMode: lowEnd(), speak: false, speechRate: 1, tutorLevel: 'auto', localLlmUrl: '', localLlmModel: 'llama3.2:1b',
+  liteMode: lowEnd(), speak: false, speechRate: 1, tutorLevel: 'auto', geminiEnabled: false, localLlmUrl: '', localLlmModel: 'llama3.2:1b',
 });
 
 function read<T>(key: string, fallback: () => T): T {

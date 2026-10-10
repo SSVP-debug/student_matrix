@@ -34,13 +34,16 @@ export const Mentor = () => {
       const r = await answer(query, index, data, p, s);
       setMsgs((m) => [...m, { role: 'tutor', text: r.markdown, reply: r }]);
       if (s.speak) speak(r.markdown, s.speechRate);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      setMsgs((m) => [...m, { role: 'tutor', text: `The AI tutor could not respond: ${message}. Check the Gemini setup in Settings or try again.` }]);
     } finally { setBusy(false); }
   };
 
   if (error) return <Page title="Tutor"><Card>Could not load course data: {error}</Card></Page>;
 
   return (
-    <Page title="Tutor" subtitle="Answers come from material stored on your device, explained at your level.">
+    <Page title="Tutor" subtitle={s.geminiEnabled ? 'Gemini can provide fuller answers; questions and relevant material are sent to Google.' : 'Answers come from material stored on your device, explained at your level.'}>
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <label htmlFor="lvl" className="text-sm text-white/70">Explanation level</label>
         <select id="lvl" value={s.tutorLevel} onChange={(e) => updateSettings({ tutorLevel: e.target.value as Settings['tutorLevel'] })} className="rounded-2xl bg-[#080910] border border-white/15 focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/10 p-2">

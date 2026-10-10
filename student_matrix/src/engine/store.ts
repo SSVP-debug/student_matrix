@@ -1,8 +1,8 @@
 import { useSyncExternalStore } from 'react';
 import type { Profile, Settings } from './types';
 
-const PROFILE_KEY = 'stellarlearn.profile.v2';
-const SETTINGS_KEY = 'stellarlearn.settings.v2';
+const PROFILE_KEY = 'student_matrix.profile.v2';
+const SETTINGS_KEY = 'student_matrix.settings.v2';
 
 const lowEnd = (): boolean => {
   try {
@@ -62,11 +62,11 @@ export const updateProfile = (fn: (p: Profile) => Profile) => profileStore.set(f
 export const updateSettings = (patch: Partial<Settings>) => settingsStore.set({ ...settingsStore.get(), ...patch });
 
 export const exportAll = (): string =>
-  JSON.stringify({ app: 'stellarlearn', version: 2, exportedAt: new Date().toISOString(), profile: profileStore.get(), settings: settingsStore.get() }, null, 2);
+  JSON.stringify({ app: 'student_matrix', version: 2, exportedAt: new Date().toISOString(), profile: profileStore.get(), settings: settingsStore.get() }, null, 2);
 
 export const importAll = (json: string): void => {
   const data = JSON.parse(json);
-  if (data?.app !== 'stellarlearn' || !data.profile) throw new Error('Not a StellarLearn backup file');
+  if (data?.app !== 'student_matrix' || !data.profile) throw new Error('Not a student_matrix backup file');
   profileStore.set({ ...defaultProfile(), ...data.profile });
   if (data.settings) settingsStore.set({ ...defaultSettings(), ...data.settings });
 };

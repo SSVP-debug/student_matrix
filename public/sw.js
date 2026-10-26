@@ -106,8 +106,8 @@ self.addEventListener('fetch', (event) => {
   event.respondWith((async () => {
     const cached = await caches.match(request);
 
-    // Cache-first for static resources. Refresh a cached response in the
-    // background, with rejection handled so offline requests do not leak errors.
+    // Cache-first for static resources. Hashed build assets are replaced by
+    // the new service-worker version on deployment.
     if (cached) return cached;
 
     try {

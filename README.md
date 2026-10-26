@@ -24,6 +24,7 @@ Offline support is not the same as offline generative AI.
 - Ollama can use a model hosted on the user's own device or private network, but the user must install and run Ollama separately and configure its URL and model.
 - API requests are deliberately excluded from service-worker caching; cloud answers are not replayed as stale offline responses.
 - The service worker is not available until the app has been loaded successfully online at least once. For reliable offline use, open the deployed app online, allow it to finish loading, and then test offline from the same browser/device.
+- After a new deployment, open the app online and reload once so the browser can install/update the new service worker and cache the latest hashed JavaScript chunks. If it still shows a blank screen, use Chrome DevTools → Application → Service Workers → **Unregister**, then Application → Storage → **Clear site data**; reload online, wait for the app to finish loading, and only then disconnect Wi-Fi. Clearing site data removes local progress/settings, so export or note anything important first.
 
 ## Technology
 

@@ -20,6 +20,20 @@ const PRECACHE = [
   ...manifestAssets,
 ].filter((url, index, all) => url && all.indexOf(url) === index);
 
+function hasExpectedContentType(path, response) {
+  const type = (response.headers.get('content-type') || '').toLowerCase();
+  const pathname = new URL(path, self.location.origin).pathname.toLowerCase();
+
+  if (pathname.endsWith('.js') || pathname.endsWith('.mjs')) {
+    return type.includes('javascript') || type.includes('ecmascript');
+  }
+  if (pathname.endsWith('.css')) return type.includes('text/css');
+  if (pathname.endsWith('.json')) return type.includes('json');
+  if (pathname.endsWith('.svg')) return type.includes('image/svg+xml');
+  if (pathname.endsWith('.html') || pathname === '/') return type.includes('text/html');
+  return true;
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(STATIC_CACHE);
@@ -30,6 +44,9 @@ self.addEventListener('install', (event) => {
       const request = new Request(path, { cache: 'reload' });
       const response = await fetch(request);
       if (!response.ok) throw new Error(`Precache failed: ${path} (${response.status})`);
+      if (!hasExpectedContentType(path, response)) {
+        throw new Error(`Precache content type mismatch: ${path} (${response.headers.get('content-type') || 'unknown'})`);
+      }
       await cache.put(request, response);
     }));
 
@@ -91,19 +108,11 @@ self.addEventListener('fetch', (event) => {
 
     // Cache-first for static resources. Refresh a cached response in the
     // background, with rejection handled so offline requests do not leak errors.
-    if (cached) {
-      event.waitUntil(fetch(request).then(async (response) => {
-        if (response.ok && response.type === 'basic') {
-          const cache = await caches.open(STATIC_CACHE);
-          await cache.put(request, response.clone());
-        }
-      }).catch(() => {}));
-      return cached;
-    }
+    if (cached) return cached;
 
     try {
       const response = await fetch(request);
-      if (response.ok && response.type === 'basic') {
+      if (response.ok && response.type === 'basic' && hasExpectedContentType(url.pathname, response)) {
         const cache = await caches.open(STATIC_CACHE);
         await cache.put(request, response.clone());
       }
